@@ -4,14 +4,13 @@ import registry from '../../data/registry.json';
 ---
 
 <BaseLayout title="Registry" description="Caleb and Emma's wedding registry." polaroidsPerSide={2}>
-  <section class="page-hero">
-    <div class="container prose">
+  <section class="page-hero page-hero--registry">
+    <div class="container">
       <h1>Registry</h1>
-      <p>{registry.message}</p>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section section--registry">
     <div class="container registry-list">
       {
         registry.registries.map((item) => (
@@ -27,3 +26,17 @@ import registry from '../../data/registry.json';
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .page-hero--registry {
+    padding-bottom: var(--space-md);
+  }
+
+  .page-hero--registry h1 {
+    margin-bottom: 0;
+  }
+
+  .section--registry {
+    padding-top: var(--space-md);
+  }
+</style>

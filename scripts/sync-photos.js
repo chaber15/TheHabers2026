@@ -46,12 +46,27 @@ function syncPhotos() {
   }
 
   const images = collectImages(source);
+  const syncedNames = new Set(images.map((image) => path.basename(image)));
 
   for (const image of images) {
     fs.copyFileSync(image, path.join(dest, path.basename(image)));
   }
 
-  console.log(`Synced ${images.length} photo(s) to public/photos/`);
+  // Remove files in public/photos that were deleted from photos/
+  let removed = 0;
+  if (fs.existsSync(dest)) {
+    for (const entry of fs.readdirSync(dest)) {
+      if (syncedNames.has(entry)) continue;
+      fs.unlinkSync(path.join(dest, entry));
+      removed += 1;
+    }
+  }
+
+  const summary =
+    removed > 0
+      ? `Synced ${images.length} photo(s) to public/photos/ (removed ${removed} stale file(s))`
+      : `Synced ${images.length} photo(s) to public/photos/`;
+  console.log(summary);
 }
 
 syncPhotos();

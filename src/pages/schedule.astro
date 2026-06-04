@@ -22,7 +22,7 @@ import schedule from '../../data/schedule.json';
   <section class="page-hero">
     <div class="container">
       <h1>Schedule & Details</h1>
-      <p>{site.wedding.formattedDate}, {site.venue.name}</p>
+      <p class="page-hero__date">{site.wedding.formattedDate}</p>
     </div>
   </section>
 
@@ -78,3 +78,17 @@ import schedule from '../../data/schedule.json';
 </BaseLayout>
   )
 }
+
+<style>
+  .page-hero__date {
+    font-family: var(--font-detail);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    color: var(--color-sage-dark);
+    margin: var(--space-sm) auto 0;
+    text-align: center;
+    line-height: 1.35;
+  }
+</style>

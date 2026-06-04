@@ -50,22 +50,35 @@ const decorPhotos = panelIds
 const leftPhotos = decorPhotos.slice(0, perSide);
 const rightPhotos = decorPhotos.slice(perSide, total);
 
+/** Nudge the top polaroid on each side slightly higher */
+const TOP_SLOT_LIFT = 4;
+/** Extra lift for Registry only */
+const REGISTRY_TOP_EXTRA = 8;
+
 /** Vertical slot as % down the side column (spread between top and bottom) */
 function slotTop(index: number, count: number, seed: string): number {
-  if (count <= 1) return 50;
-  if (count === 2) {
-    if (seed.includes('rsvp')) return [22, 72][index] ?? 50;
-    return [26, 74][index] ?? 50;
-  }
-  if (count === 3) {
+  let top: number;
+
+  if (count <= 1) top = 50;
+  else if (count === 2) {
+    if (seed.includes('rsvp')) top = [22, 72][index] ?? 50;
+    else top = [26, 74][index] ?? 50;
+  } else if (count === 3) {
     let slots = [28, 50, 72];
     if (seed.includes('faq')) slots = [20, 50, 80];
     else if (seed.includes('wedding-party')) slots = [24, 50, 76];
-    return slots[index] ?? 50;
+    top = slots[index] ?? 50;
+  } else {
+    const inset = 12;
+    const span = 100 - inset * 2;
+    top = inset + (span / (count - 1)) * index;
   }
-  const inset = 12;
-  const span = 100 - inset * 2;
-  return inset + (span / (count - 1)) * index;
+
+  if (index === 0) {
+    top = Math.max(6, top - TOP_SLOT_LIFT);
+    if (seed.includes('registry')) top = Math.max(6, top - REGISTRY_TOP_EXTRA);
+  }
+  return top;
 }
 
 /** Slight alternating tilts so the strip feels hand-placed */

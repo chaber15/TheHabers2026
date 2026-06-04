@@ -19,7 +19,8 @@
   "dependencies": {
     "@astrojs/netlify": "^7.0.11",
     "@netlify/blobs": "^10.7.9",
-    "astro": "^6.4.2"
+    "astro": "^6.4.2",
+    "exifr": "^7.1.3"
   },
   "devDependencies": {
     "@netlify/functions": "^4.2.3",

@@ -3,43 +3,41 @@
     {
       "time": "3:30 PM",
       "title": "Guests Arrive",
-      "description": "Please arrive and find your seat before the ceremony begins.",
-      "location": "Good Hope Presbyterian Church"
+      "description": "Please arrive and find your seat before the ceremony begins",
+      "location": "Sanctuary, Good Hope Presbyterian Church"
     },
     {
       "time": "4:00 PM",
       "title": "Ceremony Begins",
-      "description": "We will exchange vows and worship God together.",
-      "location": "Sanctuary"
+      "description": "We will exchange vows and worship God together",
+      "location": "Sanctuary, Good Hope Presbyterian Church"
     },
     {
       "time": "4:45 PM",
       "title": "Refreshments",
-      "description": "Light bites and drinks while the wedding party takes photos.",
-      "location": "Outdoor Pavilion, Mt Zion United Methodist Church"
+      "description": "Light bites and drinks while the wedding party takes photos",
+      "location": "Outdoor Pavilion, Mount Zion United Methodist Church"
     },
     {
       "time": "6:00 PM",
       "title": "Dinner",
-      "description": "Join us for dinner under the pavilion.",
-      "location": "Outdoor Pavilion, Mt Zion United Methodist Church"
+      "description": "Join us for Indian cuisine under the pavilion",
+      "location": "Outdoor Pavilion, Mount Zion United Methodist Church"
     },
     {
       "time": "7:00 PM",
-      "title": "Dancing",
-      "description": "Celebrate with us on the dance floor.",
-      "location": "Outdoor Pavilion, Mt Zion United Methodist Church"
+      "title": "Speeches and First Dance",
+      "description": "Celebrate with us on the dance floor!",
+      "location": "Outdoor Pavilion, Mount Zion United Methodist Church"
     },
     {
       "time": "9:00 PM",
       "title": "Grand Exit",
-      "description": "Send us off as we close out the evening.",
-      "location": "Outdoor Pavilion, Mt Zion United Methodist Church"
+      "description": "Send us off as we close out the evening!",
+      "location": "Outdoor Pavilion, Mount Zion United Methodist Church"
     }
   ],
   "notes": [
-    "Ceremony will be held at Good Hope Presbyterian Church.",
-    "Refreshments, dinner, dancing, and our grand exit will be at the outdoor pavilion at Mt Zion United Methodist Church, just down the road.",
     "Schedule times are approximate and subject to minor adjustments."
   ]
 }

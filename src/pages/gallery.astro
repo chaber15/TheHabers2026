@@ -4,35 +4,41 @@ import ComingSoon from '../components/ComingSoon.astro';
 import { isPageAvailable } from '../config/page-availability';
 import story from '../../data/story.json';
 import PhotoGallery from '../components/PhotoGallery.astro';
-import { getPhotoManifest } from '../utils/photos';
+import { getPhotoManifest, getAboutUsPhotosChronological } from '../utils/photos';
 
-const photos = getPhotoManifest();
+const aboutPhotos = await getAboutUsPhotosChronological(getPhotoManifest());
 ---
 
 {
   !isPageAvailable('gallery') ? (
     <ComingSoon
-      title="Our Story"
-      heading="Our Story"
-      description="Our story and photo gallery are coming soon."
+      title="About Us"
+      heading="About Us"
+      description="Our story and photos are coming soon."
     />
   ) : (
-<BaseLayout
-  title="Our Story"
-  description="Caleb and Emma's story and photo gallery."
-  polaroidDecor={false}
->
-  <section class="story-gallery">
-    <div class="container story-gallery__intro">
-      <h1>Our Story</h1>
-      <p class="story-gallery__text">{story.intro}</p>
-    </div>
+    <BaseLayout
+      title="About Us"
+      description="Caleb and Emma's story and photos."
+      polaroidDecor={false}
+    >
+      <section class="story-gallery">
+        <div class="container story-gallery__intro">
+          <h1>About Us</h1>
+          <p class="story-gallery__text">{story.intro}</p>
+        </div>
 
-    <div class="container">
-      <PhotoGallery photos={photos} />
-    </div>
-  </section>
-</BaseLayout>
+        <div class="container">
+          {
+            aboutPhotos.length > 0 ? (
+              <PhotoGallery photos={aboutPhotos} variant="about" />
+            ) : (
+              <p class="story-gallery__empty">Photos coming soon.</p>
+            )
+          }
+        </div>
+      </section>
+    </BaseLayout>
   )
 }
 
@@ -58,5 +64,11 @@ const photos = getPhotoManifest();
     line-height: 1.75;
     color: var(--color-warm-gray);
     text-wrap: pretty;
+  }
+
+  .story-gallery__empty {
+    text-align: center;
+    color: var(--color-warm-gray);
+    margin: 0;
   }
 </style>

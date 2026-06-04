@@ -1,18 +1,82 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import type { PhotoEntry } from '../utils/photos';
 
 interface Props {
   photos: PhotoEntry[];
+  /** `about` — masonry layout, mixed orientations, no face crop */
+  variant?: 'default' | 'about';
 }
 
-const { photos } = Astro.props;
+const { photos, variant = 'default' } = Astro.props;
+
+const PHOTOS_PUBLIC = path.join(process.cwd(), 'public', 'photos');
+
+type GalleryPhoto = PhotoEntry & { orientation: 'landscape' | 'portrait' | 'square' };
+
+/** Read width/height at build time so landscape shots can span wider grid cells */
+function imageDimensions(filePath: string): { width: number; height: number } | null {
+  if (!fs.existsSync(filePath)) return null;
+
+  const buf = fs.readFileSync(filePath);
+  if (buf.length < 24) return null;
+
+  // JPEG
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    let offset = 2;
+    while (offset < buf.length - 8) {
+      if (buf[offset] !== 0xff) break;
+      const marker = buf[offset + 1];
+      const length = buf.readUInt16BE(offset + 2);
+      if (marker === 0xc0 || marker === 0xc1 || marker === 0xc2) {
+        return {
+          width: buf.readUInt16BE(offset + 7),
+          height: buf.readUInt16BE(offset + 5),
+        };
+      }
+      offset += 2 + length;
+    }
+  }
+
+  // PNG
+  if (buf.toString('ascii', 0, 8) === '\x89PNG\r\n\x1a\n') {
+    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  }
+
+  return null;
+}
+
+function orientationFor(photo: PhotoEntry): GalleryPhoto['orientation'] {
+  const dims = imageDimensions(path.join(PHOTOS_PUBLIC, photo.filename));
+  if (!dims) return 'portrait';
+  const ratio = dims.width / dims.height;
+  if (ratio > 1.15) return 'landscape';
+  if (ratio < 0.85) return 'portrait';
+  return 'square';
+}
+
+const galleryPhotos: GalleryPhoto[] =
+  variant === 'about'
+    ? photos.map((photo) => ({ ...photo, orientation: orientationFor(photo) }))
+    : photos.map((photo) => ({ ...photo, orientation: 'portrait' as const }));
 ---
 
-<div class="photo-gallery">
+<div
+  class:list={[
+    'photo-gallery',
+    variant === 'about' && 'photo-gallery--about',
+  ]}
+>
   {
-    photos.map((photo) => (
-      <figure class="gallery-item">
-        <img src={photo.src} alt={photo.alt} loading="lazy" width="800" height="600" />
+    galleryPhotos.map((photo) => (
+      <figure
+        class:list={[
+          'gallery-item',
+          variant === 'about' && `gallery-item--${photo.orientation}`,
+        ]}
+      >
+        <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
       </figure>
     ))
   }
@@ -37,6 +101,7 @@ const { photos } = Astro.props;
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+    display: block;
     transition: transform var(--transition);
   }
 
@@ -52,12 +117,67 @@ const { photos } = Astro.props;
       gap: var(--space-lg);
     }
 
-    .gallery-item:first-child {
+    .photo-gallery:not(.photo-gallery--about) .gallery-item:first-child {
       grid-column: span 2;
     }
 
-    .gallery-item:first-child img {
+    .photo-gallery:not(.photo-gallery--about) .gallery-item:first-child img {
       aspect-ratio: 21 / 9;
+    }
+  }
+
+  /* About Us — mixed-orientation masonry grid */
+  .photo-gallery--about {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+    align-items: start;
+    grid-auto-flow: dense;
+  }
+
+  .photo-gallery--about .gallery-item {
+    background: var(--color-ivory-deep);
+  }
+
+  .photo-gallery--about .gallery-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: unset;
+    object-fit: contain;
+    object-position: center center;
+    vertical-align: middle;
+  }
+
+  @media (hover: hover) {
+    .photo-gallery--about .gallery-item:hover img {
+      transform: none;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .photo-gallery--about {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .photo-gallery--about .gallery-item--landscape {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .photo-gallery--about {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    /* 3-col grid: landscape spans 2 of 3; portrait/square use 1 */
+    .photo-gallery--about .gallery-item--landscape {
+      grid-column: span 2;
+    }
+
+    .photo-gallery--about .gallery-item--portrait,
+    .photo-gallery--about .gallery-item--square {
+      grid-column: span 1;
     }
   }
 </style>

@@ -9,7 +9,7 @@ export interface NavLink {
 const ALL_NAV_LINKS: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '/schedule', label: 'Schedule', pageId: 'schedule' },
-  { href: '/gallery', label: 'Our Story', pageId: 'gallery' },
+  { href: '/gallery', label: 'About Us', pageId: 'gallery' },
   { href: '/wedding-party', label: 'Wedding Party' },
   { href: '/registry', label: 'Registry' },
   { href: '/faq', label: 'FAQ', pageId: 'faq' },

@@ -20,6 +20,8 @@
   /* Typography */
   --font-heading: 'Italiana', Georgia, serif;
   --font-body: 'Jost', system-ui, sans-serif;
+  /* Dates, times, countdown — readable serif with a bit of romance */
+  --font-detail: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
 
   /* Spacing scale */
   --space-xs: 4px;
@@ -399,8 +401,12 @@ p:last-child {
 }
 
 .timeline-time {
-  font-family: var(--font-heading);
-  font-size: 1.35rem;
+  font-family: var(--font-detail);
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
   color: var(--color-sage-dark);
   line-height: 1.2;
 }

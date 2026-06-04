@@ -1,7 +1,7 @@
 /** Flip to `true` when a page is ready to publish */
 export const PAGE_AVAILABLE = {
-  schedule: false,
-  gallery: false,
+  schedule: true,
+  gallery: true,
   faq: false,
 } as const;
 

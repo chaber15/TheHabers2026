@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import exifr from 'exifr';
 
 /** Photo manifest entry with optional display tags */
 export interface PhotoEntry {
@@ -117,6 +118,60 @@ export function getHeroPanelPhotos(
   limit = 6
 ): PhotoEntry[] {
   return getDecorPhotoPool(photos, landingPhoto).slice(0, limit);
+}
+
+const ABOUT_US_DIR = path.join(PHOTOS_DIR, 'about us');
+
+/** Photos from the `photos/about us/` folder (auto-tagged `about`) */
+export function getAboutUsPhotos(photos: PhotoEntry[]): PhotoEntry[] {
+  return photos.filter((photo) => photo.tags.includes('about'));
+}
+
+/** Resolve source file for an about-us photo (folder scan, then flat public copy) */
+function aboutUsSourcePath(filename: string): string | null {
+  const inAlbum = path.join(ABOUT_US_DIR, filename);
+  if (fs.existsSync(inAlbum)) return inAlbum;
+
+  const inPublic = path.join(process.cwd(), 'public', 'photos', filename);
+  if (fs.existsSync(inPublic)) return inPublic;
+
+  return null;
+}
+
+/** Best available capture date from EXIF, else file modified time */
+async function photoTakenTime(filename: string): Promise<number> {
+  const filePath = aboutUsSourcePath(filename);
+  if (!filePath) return 0;
+
+  try {
+    const exif = await exifr.parse(filePath, {
+      pick: ['DateTimeOriginal', 'CreateDate', 'ModifyDate'],
+    });
+    const raw = exif?.DateTimeOriginal ?? exif?.CreateDate ?? exif?.ModifyDate;
+    if (raw) {
+      const ms = new Date(raw).getTime();
+      if (!Number.isNaN(ms)) return ms;
+    }
+  } catch {
+    /* fall back to file mtime */
+  }
+
+  return fs.statSync(filePath).mtimeMs;
+}
+
+/** About-us album sorted oldest → newest using photo metadata */
+export async function getAboutUsPhotosChronological(
+  photos: PhotoEntry[]
+): Promise<PhotoEntry[]> {
+  const about = getAboutUsPhotos(photos);
+  const dated = await Promise.all(
+    about.map(async (photo) => ({
+      photo,
+      time: await photoTakenTime(photo.filename),
+    }))
+  );
+
+  return dated.sort((a, b) => a.time - b.time).map(({ photo }) => photo);
 }
 
 /** All proposal shots usable for side decorations (landing folder, excluding the hero image) */

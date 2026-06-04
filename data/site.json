@@ -12,18 +12,18 @@
   },
   "venue": {
     "name": "Good Hope Presbyterian Church",
-    "address": "12131 Scaggsville Rd",
+    "address": "12131 Route 216",
     "city": "Highland",
-    "state": "MD",
+    "state": "MD ",
     "zip": "20777",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=12131+Scaggsville+Rd,+Highland,+MD+20777"
   },
   "receptionVenue": {
-    "name": "Mt Zion United Methodist Church",
+    "name": "Mount Zion United Methodist Church",
     "space": "Outdoor Pavilion",
-    "address": "12430 Scaggsville Rd",
+    "address": "12430 Route 216",
     "city": "Highland",
-    "state": "MD",
+    "state": "MD ",
     "zip": "20777",
     "mapUrl": "https://www.google.com/maps/search/?api=1&query=12430+Scaggsville+Rd,+Highland,+MD+20777"
   },
