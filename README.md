@@ -131,14 +131,9 @@ Saves merged data to `data/rsvp-export.json`.
 2. Sign in with the `ADMIN_PASSWORD` from your Netlify env vars
 3. View the RSVP table or click **Export CSV**
 
-### Demo codes (local testing)
+### Test codes (local testing)
 
-The seed `data/guests.json` includes demo parties:
-
-| Party | Code |
-|-------|------|
-| The Demo Family | `DEMO01` |
-| Alex & Jordan Lee | `DEMO02` |
+Each party in `data/guests.json` has a unique access code. Run `npm run guests -- list` to print all codes. RSVP requires `npm run dev:netlify` (not `npm run dev`).
 
 ---
 

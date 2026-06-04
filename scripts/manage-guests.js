@@ -123,12 +123,13 @@ function listGuests() {
     return;
   }
 
-  console.log(`\n${'Party'.padEnd(30)} ${'Code'.padEnd(8)} Size  Status`);
+  console.log(`\n${'Party'.padEnd(30)} ${'Code'.padEnd(8)} Guests  Status`);
   console.log('-'.repeat(60));
 
   for (const party of data.parties) {
+    const guestCount = party.members?.length ?? party.partySize ?? 0;
     console.log(
-      `${party.partyName.padEnd(30)} ${party.accessCode.padEnd(8)} ${String(party.partySize).padEnd(4)}  ${party.rsvpStatus}`
+      `${party.partyName.padEnd(30)} ${party.accessCode.padEnd(8)} ${String(guestCount).padEnd(6)}  ${party.rsvpStatus}`
     );
   }
 

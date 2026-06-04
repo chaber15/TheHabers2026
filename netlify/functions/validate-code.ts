@@ -51,6 +51,7 @@ export const handler: Handler = async (event) => {
       publicParty.rsvpStatus = 'responded';
       publicParty.attending = stored.attending;
       publicParty.attendeeCount = stored.attendeeCount;
+      publicParty.guestResponses = stored.guestResponses ?? null;
       publicParty.dietaryNotes = stored.dietaryNotes;
       publicParty.message = stored.message;
       publicParty.rsvpSubmittedAt = stored.submittedAt;

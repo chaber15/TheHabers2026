@@ -1,7 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { createAdminToken, getBearerToken, verifyAdminToken } from './lib/auth';
 import { loadGuests } from './lib/guests';
-import { bindBlobsContext, listRsvps } from './lib/blobs';
+import { bindBlobsContext, formatGuestResponses, listRsvps } from './lib/blobs';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +11,9 @@ const CORS_HEADERS = {
 
 /** Build CSV export from guest list merged with blob RSVPs */
 function buildCsv(rows: Array<Record<string, string | number | boolean | null>>): string {
-  if (rows.length === 0) return 'partyId,partyName,partySize,accessCode,rsvpStatus,attending,attendeeCount,dietaryNotes,message,submittedAt\n';
+  if (rows.length === 0) {
+    return 'partyId,partyName,partySize,accessCode,rsvpStatus,attending,attendeeCount,guestResponses,dietaryNotes,message,submittedAt\n';
+  }
 
   const headers = Object.keys(rows[0]);
   const lines = [
@@ -100,6 +102,7 @@ export const handler: Handler = async (event) => {
         rsvpStatus: rsvp ? 'responded' : party.rsvpStatus,
         attending: rsvp?.attending ?? party.attending,
         attendeeCount: rsvp?.attendeeCount ?? party.attendeeCount,
+        guestResponses: formatGuestResponses(rsvp?.guestResponses),
         dietaryNotes: rsvp?.dietaryNotes ?? party.dietaryNotes,
         message: rsvp?.message ?? party.message,
         submittedAt: rsvp?.submittedAt ?? party.rsvpSubmittedAt,

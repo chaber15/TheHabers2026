@@ -1,7 +1,7 @@
 /**
- * Two-step RSVP form: access code validation, then submission.
+ * Two-step RSVP form: access code validation, then per-guest attendance.
  */
-import { API_RSVP, API_VALIDATE_CODE } from '../utils/constants.ts';
+import { API_RSVP, API_VALIDATE_CODE, apiUrl } from '../utils/constants.ts';
 
 /** Initialize the RSVP form inside the given root element */
 export function initRsvpForm(root) {
@@ -12,7 +12,7 @@ export function initRsvpForm(root) {
       <p class="rsvp-intro">Enter the access code printed on your invitation to RSVP.</p>
       <div class="form-group">
         <label for="access-code">Access Code</label>
-        <input id="access-code" class="form-input" type="text" autocomplete="off" placeholder="e.g. DEMO01" maxlength="12" />
+        <input id="access-code" class="form-input" type="text" autocomplete="off" placeholder="e.g. HBRFAM" maxlength="12" />
       </div>
       <button type="button" class="btn btn-primary" id="validate-btn">Continue</button>
       <p class="form-error" id="code-error" hidden></p>
@@ -22,23 +22,12 @@ export function initRsvpForm(root) {
       <p class="rsvp-greeting" id="party-greeting"></p>
       <form id="rsvp-form">
         <div class="form-group">
-          <label>Will you be attending?</label>
-          <div class="radio-group">
-            <label><input type="radio" name="attending" value="yes" required /> Joyfully accept</label>
-            <label><input type="radio" name="attending" value="no" required /> Regretfully decline</label>
-          </div>
-        </div>
-        <div class="form-group" id="count-group">
-          <label for="attendee-count">Number attending (including yourself)</label>
-          <select id="attendee-count" class="form-select"></select>
+          <p class="guest-list-label">Please let us know who will be joining us.</p>
+          <div id="guest-list" class="guest-list"></div>
         </div>
         <div class="form-group">
           <label for="dietary-notes">Dietary restrictions (optional)</label>
           <input id="dietary-notes" class="form-input" type="text" placeholder="Vegetarian, gluten-free, etc." />
-        </div>
-        <div class="form-group">
-          <label for="rsvp-message">Message for the couple (optional)</label>
-          <textarea id="rsvp-message" class="form-textarea" placeholder="We are so happy for you!"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit RSVP</button>
         <p class="form-error" id="form-error" hidden></p>
@@ -56,6 +45,7 @@ export function initRsvpForm(root) {
       <div class="rsvp-confirmation card">
         <h2>Already submitted</h2>
         <p id="already-text"></p>
+        <ul id="already-guest-list" class="already-guest-list"></ul>
       </div>
     </div>
   `;
@@ -69,11 +59,11 @@ export function initRsvpForm(root) {
   const codeError = root.querySelector('#code-error');
   const partyGreeting = root.querySelector('#party-greeting');
   const rsvpForm = root.querySelector('#rsvp-form');
-  const countSelect = root.querySelector('#attendee-count');
-  const countGroup = root.querySelector('#count-group');
+  const guestList = root.querySelector('#guest-list');
   const formError = root.querySelector('#form-error');
   const confirmationText = root.querySelector('#confirmation-text');
   const alreadyText = root.querySelector('#already-text');
+  const alreadyGuestList = root.querySelector('#already-guest-list');
 
   /** Show a single step panel */
   function showStep(step) {
@@ -82,24 +72,109 @@ export function initRsvpForm(root) {
     });
   }
 
-  /** Populate attendee count dropdown based on party size */
-  function fillCountOptions(max) {
-    countSelect.innerHTML = '';
-    for (let i = 1; i <= max; i += 1) {
-      const option = document.createElement('option');
-      option.value = String(i);
-      option.textContent = String(i);
-      countSelect.appendChild(option);
+  /** Label for RSVP UI (Plus One linked to host guest) */
+  function memberDisplayName(member, members) {
+    if (member.displayName) return member.displayName;
+    if (member.isPlusOne && member.plusOneFor) {
+      const host = members.find((m) => m.id === member.plusOneFor);
+      const label = host?.name?.trim().split(/\s+/)[0] ?? 'Guest';
+      return `Plus One (${label})`;
     }
+    if (member.isPlusOne) return 'Plus One';
+    return member.name;
   }
 
-  /** Toggle attendee count visibility based on attending radio */
-  function syncCountVisibility() {
-    const attending = rsvpForm.querySelector('input[name="attending"]:checked')?.value;
-    countGroup.hidden = attending !== 'yes';
+  /** Build per-guest coming / not coming controls */
+  function renderGuestList(members) {
+    guestList.innerHTML = members
+      .map((member) => {
+        const label = memberDisplayName(member, members);
+        return `
+        <div class="guest-card">
+          <div class="guest-card-header">
+            <span class="guest-name">${label}</span>
+          </div>
+          <div class="guest-choices" role="group" aria-label="RSVP for ${label}">
+            <label class="guest-choice guest-choice--yes">
+              <input type="radio" name="guest-${member.id}" value="yes" required />
+              <span class="guest-choice-text">Joining us</span>
+            </label>
+            <label class="guest-choice guest-choice--no">
+              <input type="radio" name="guest-${member.id}" value="no" required />
+              <span class="guest-choice-text">Can't make it</span>
+            </label>
+          </div>
+        </div>
+      `;
+      })
+      .join('');
   }
 
-  rsvpForm.addEventListener('change', syncCountVisibility);
+  /** Collect guest responses from the form */
+  function collectGuestResponses(members) {
+    return members.map((member) => {
+      const value = rsvpForm.querySelector(`input[name="guest-${member.id}"]:checked`)?.value;
+      return {
+        guestId: member.id,
+        name: memberDisplayName(member, members),
+        attending: value === 'yes',
+      };
+    });
+  }
+
+  /** Join name parts with natural "and" (e.g. Kate, Joseph and a guest) */
+  function joinNameList(parts) {
+    if (parts.length === 0) return '';
+    if (parts.length === 1) return parts[0];
+    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+    return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+  }
+
+  /** Thank-you copy uses real names only; plus-ones count as "a guest" */
+  function formatAttendingForThankYou(responses, members) {
+    const byId = new Map(members.map((m) => [m.id, m]));
+    const realNames = [];
+    let plusOnesAttending = 0;
+
+    for (const response of responses) {
+      if (!response.attending) continue;
+      const member = byId.get(response.guestId);
+      if (member?.isPlusOne) {
+        plusOnesAttending += 1;
+      } else {
+        realNames.push(member?.name ?? response.name);
+      }
+    }
+
+    const parts = [...realNames];
+    if (plusOnesAttending === 1) parts.push('a guest');
+    else if (plusOnesAttending > 1) parts.push(`${plusOnesAttending} guests`);
+
+    return joinNameList(parts);
+  }
+
+  /** Name shown in already-submitted list (no "Plus One" label) */
+  function nameForSummary(member, members) {
+    if (!member?.isPlusOne) return member?.name ?? '';
+    return 'Guest';
+  }
+
+  /** Render bullet list of prior guest responses */
+  function renderAlreadyList(responses, members) {
+    if (!responses?.length) {
+      alreadyGuestList.hidden = true;
+      return;
+    }
+    const byId = new Map(members.map((m) => [m.id, m]));
+    alreadyGuestList.hidden = false;
+    alreadyGuestList.innerHTML = responses
+      .map((g) => {
+        const member = byId.get(g.guestId);
+        const label = nameForSummary(member, members) || g.name;
+        return `<li class="already-guest-item"><span class="already-guest-name">${label}</span><span class="already-guest-status ${g.attending ? 'is-attending' : 'is-declined'}">${g.attending ? 'Joining us' : "Can't make it"}</span></li>`;
+      })
+      .join('');
+  }
 
   /** Validate access code via API */
   async function validateCode() {
@@ -107,7 +182,7 @@ export function initRsvpForm(root) {
     validateBtn.disabled = true;
 
     try {
-      const response = await fetch(API_VALIDATE_CODE, {
+      const response = await fetch(apiUrl(API_VALIDATE_CODE), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: codeInput.value.trim() }),
@@ -124,15 +199,15 @@ export function initRsvpForm(root) {
       party = data.party;
 
       if (party.rsvpStatus === 'responded') {
-        const status = party.attending ? 'attending' : 'not attending';
-        alreadyText.textContent = `We already have your RSVP for ${party.partyName} (${status}, ${party.attendeeCount ?? 0} guest(s)). Contact us if you need to make a change.`;
+        const count = party.attendeeCount ?? 0;
+        alreadyText.textContent = `We already have your RSVP for ${party.partyName} (${count} guest(s) attending). Contact us if you need to make a change.`;
+        renderAlreadyList(party.guestResponses, party.members);
         showStep('already');
         return;
       }
 
-      partyGreeting.textContent = `Welcome, ${party.partyName}! You may RSVP for up to ${party.partySize} guest(s).`;
-      fillCountOptions(party.partySize);
-      syncCountVisibility();
+      partyGreeting.textContent = `Welcome, ${party.partyName}!`;
+      renderGuestList(party.members);
       showStep('form');
     } catch {
       codeError.textContent = 'Unable to connect. Please try again.';
@@ -147,20 +222,27 @@ export function initRsvpForm(root) {
     event.preventDefault();
     formError.hidden = true;
 
-    const attendingValue = rsvpForm.querySelector('input[name="attending"]:checked')?.value;
-    const attending = attendingValue === 'yes';
+    const guestResponses = collectGuestResponses(party.members);
+    const incomplete = guestResponses.some((g) => {
+      const checked = rsvpForm.querySelector(`input[name="guest-${g.guestId}"]:checked`);
+      return !checked;
+    });
+
+    if (incomplete) {
+      formError.textContent = 'Please select coming or not coming for each guest.';
+      formError.hidden = false;
+      return;
+    }
 
     try {
-      const response = await fetch(API_RSVP, {
+      const response = await fetch(apiUrl(API_RSVP), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           partyId: party.partyId,
           accessCode: codeInput.value.trim(),
-          attending,
-          attendeeCount: attending ? Number(countSelect.value) : 0,
+          guestResponses,
           dietaryNotes: root.querySelector('#dietary-notes').value,
-          message: root.querySelector('#rsvp-message').value,
         }),
       });
 
@@ -172,9 +254,17 @@ export function initRsvpForm(root) {
         return;
       }
 
-      confirmationText.textContent = attending
-        ? `We're so glad ${party.partyName} will be joining us! We can't wait to celebrate together.`
-        : `Thank you for letting us know. We'll miss you, but we appreciate your warm wishes.`;
+      const attendingLabel = formatAttendingForThankYou(guestResponses, party.members);
+      const everyoneComing = guestResponses.every((g) => g.attending);
+      const noOneComing = guestResponses.every((g) => !g.attending);
+
+      if (noOneComing) {
+        confirmationText.textContent = `Thank you for letting us know. We'll miss you at the celebration.`;
+      } else if (everyoneComing) {
+        confirmationText.textContent = `We're so glad ${attendingLabel} will be joining us! We can't wait to celebrate together.`;
+      } else {
+        confirmationText.textContent = `Thank you! We're excited to celebrate with ${attendingLabel}.`;
+      }
       showStep('done');
     } catch {
       formError.textContent = 'Unable to connect. Please try again.';

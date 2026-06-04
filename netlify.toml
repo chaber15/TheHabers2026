@@ -3,6 +3,10 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# Guest list is read at runtime by Netlify Functions (not shipped in dist/)
+[functions]
+  included_files = ["data/guests.json"]
+
 [dev]
   command = "astro dev"
   targetPort = 4321

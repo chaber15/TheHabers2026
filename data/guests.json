@@ -1,11 +1,17 @@
 {
   "parties": [
     {
-      "id": "demo-001",
-      "partyName": "The Demo Family",
-      "partySize": 2,
-      "accessCode": "DEMO01",
-      "zip": "00000",
+      "id": "haber-family",
+      "partyName": "Haber Family",
+      "accessCode": "HBRFAM",
+      "zip": "",
+      "members": [
+        { "id": "kate-haber", "name": "Kate Haber" },
+        { "id": "joseph-haber", "name": "Joseph Haber" },
+        { "id": "hannah-haber", "name": "Hannah Haber" },
+        { "id": "grace-haber", "name": "Grace Haber" }
+      ],
+      "partySize": 4,
       "rsvpStatus": "pending",
       "rsvpSubmittedAt": null,
       "attending": null,
@@ -14,11 +20,12 @@
       "message": null
     },
     {
-      "id": "demo-002",
-      "partyName": "Alex & Jordan Lee",
-      "partySize": 2,
-      "accessCode": "DEMO02",
-      "zip": "00000",
+      "id": "connnolly-haber",
+      "partyName": "Connnolly Haber",
+      "accessCode": "CONHBR",
+      "zip": "",
+      "members": [{ "id": "connnolly-haber", "name": "Connnolly Haber" }],
+      "partySize": 1,
       "rsvpStatus": "pending",
       "rsvpSubmittedAt": null,
       "attending": null,
@@ -27,11 +34,115 @@
       "message": null
     },
     {
-      "id": "caleb-test-party",
-      "partyName": "Caleb Test Party",
+      "id": "la-star",
+      "partyName": "L-A Star",
+      "accessCode": "LASTAR",
+      "zip": "",
+      "members": [
+        { "id": "la-star", "name": "L-A Star" },
+        {
+          "id": "la-star-plus-one",
+          "name": "Plus One",
+          "isPlusOne": true,
+          "plusOneFor": "la-star"
+        }
+      ],
       "partySize": 2,
-      "accessCode": "WG2W44",
-      "zip": "12345",
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "poobah",
+      "partyName": "Poobah",
+      "accessCode": "POOBAH",
+      "zip": "",
+      "members": [{ "id": "poobah", "name": "Poobah" }],
+      "partySize": 1,
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "wifey",
+      "partyName": "Wifey",
+      "accessCode": "WIFEYM",
+      "zip": "",
+      "members": [{ "id": "emma-vanden-berg", "name": "Emma Vanden Berg" }],
+      "partySize": 1,
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "amy-vanden-berg",
+      "partyName": "Amy Vanden Berg",
+      "accessCode": "AMYVEN",
+      "zip": "",
+      "members": [
+        { "id": "amy-vanden-berg", "name": "Amy Vanden Berg" },
+        {
+          "id": "amy-vanden-berg-plus-one",
+          "name": "Plus One",
+          "isPlusOne": true,
+          "plusOneFor": "amy-vanden-berg"
+        }
+      ],
+      "partySize": 2,
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "marcus-hadeed",
+      "partyName": "Marcus Hadeed",
+      "accessCode": "MRCHAD",
+      "zip": "",
+      "members": [{ "id": "marcus-hadeed", "name": "Marcus Hadeed" }],
+      "partySize": 1,
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "john-becky-hadeed",
+      "partyName": "John and Becky Hadeed",
+      "accessCode": "JBKHAD",
+      "zip": "",
+      "members": [
+        { "id": "becky-hadeed", "name": "Becky Hadeed" },
+        { "id": "john-hadeed", "name": "John Hadeed" }
+      ],
+      "partySize": 2,
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "caleb-haber",
+      "partyName": "Caleb Haber",
+      "accessCode": "CALEBH",
+      "zip": "",
+      "members": [{ "id": "caleb-haber", "name": "Caleb Haber" }],
+      "partySize": 1,
       "rsvpStatus": "pending",
       "rsvpSubmittedAt": null,
       "attending": null,

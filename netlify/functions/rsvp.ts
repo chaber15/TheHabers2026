@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions';
-import { findPartyByCode, safeEqual } from './lib/guests';
+import { findPartyByCode, getMemberDisplayName, safeEqual } from './lib/guests';
+import type { GuestResponse } from './lib/blobs';
 import { bindBlobsContext, getRsvp, saveRsvp } from './lib/blobs';
 
 const CORS_HEADERS = {
@@ -11,10 +12,38 @@ const CORS_HEADERS = {
 interface RsvpBody {
   partyId?: string;
   accessCode?: string;
-  attending?: boolean;
-  attendeeCount?: number;
+  guestResponses?: GuestResponse[];
   dietaryNotes?: string;
   message?: string;
+}
+
+/** Validate submitted guest responses match the party roster */
+function validateGuestResponses(
+  party: { members: Array<{ id: string; name: string }> },
+  responses: GuestResponse[] | undefined
+): GuestResponse[] | null {
+  if (!responses?.length) return null;
+
+  const memberMap = new Map(
+    party.members.map((m) => [m.id, getMemberDisplayName(m, party.members)])
+  );
+  if (responses.length !== memberMap.size) return null;
+
+  const seen = new Set<string>();
+  const normalized: GuestResponse[] = [];
+
+  for (const entry of responses) {
+    if (!entry.guestId || typeof entry.attending !== 'boolean') return null;
+    if (!memberMap.has(entry.guestId) || seen.has(entry.guestId)) return null;
+    seen.add(entry.guestId);
+    normalized.push({
+      guestId: entry.guestId,
+      name: memberMap.get(entry.guestId)!,
+      attending: entry.attending,
+    });
+  }
+
+  return normalized;
 }
 
 /** Accept and persist an RSVP submission */
@@ -34,9 +63,9 @@ export const handler: Handler = async (event) => {
   try {
     bindBlobsContext(event);
     const body = JSON.parse(event.body ?? '{}') as RsvpBody;
-    const { partyId, accessCode, attending, attendeeCount, dietaryNotes, message } = body;
+    const { partyId, accessCode, guestResponses, dietaryNotes, message } = body;
 
-    if (!partyId || !accessCode || attending === undefined) {
+    if (!partyId || !accessCode) {
       return {
         statusCode: 400,
         headers: CORS_HEADERS,
@@ -73,21 +102,23 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const count = attending ? Math.min(Number(attendeeCount) || 1, party.partySize) : 0;
-
-    if (attending && count < 1) {
+    const normalized = validateGuestResponses(party, guestResponses);
+    if (!normalized) {
       return {
         statusCode: 400,
         headers: CORS_HEADERS,
-        body: JSON.stringify({ error: 'Please specify how many guests will attend.' }),
+        body: JSON.stringify({ error: 'Please select coming or not coming for each guest.' }),
       };
     }
+
+    const attendeeCount = normalized.filter((g) => g.attending).length;
 
     const rsvp = {
       partyId: party.id,
       partyName: party.partyName,
-      attending: Boolean(attending),
-      attendeeCount: attending ? count : 0,
+      guestResponses: normalized,
+      attending: attendeeCount > 0,
+      attendeeCount,
       dietaryNotes: (dietaryNotes ?? '').trim(),
       message: (message ?? '').trim(),
       submittedAt: new Date().toISOString(),

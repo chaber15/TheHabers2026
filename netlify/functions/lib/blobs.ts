@@ -3,23 +3,30 @@ import type { HandlerEvent } from '@netlify/functions';
 
 const STORE_NAME = 'wedding-rsvps';
 
-/** Wire Netlify Blobs context from the Lambda-compatible function event */
-export function bindBlobsContext(event: HandlerEvent): void {
-  // Netlify Dev injects blob config on the event; skip if absent (env may already be set).
-  if ((event as HandlerEvent & { blobs?: string }).blobs) {
-    connectLambda(event);
-  }
+/** Per-guest RSVP choice */
+export interface GuestResponse {
+  guestId: string;
+  name: string;
+  attending: boolean;
 }
 
 /** RSVP payload stored in Netlify Blobs */
 export interface StoredRsvp {
   partyId: string;
   partyName: string;
+  guestResponses: GuestResponse[];
   attending: boolean;
   attendeeCount: number;
   dietaryNotes: string;
   message: string;
   submittedAt: string;
+}
+
+/** Wire Netlify Blobs context from the Lambda-compatible function event */
+export function bindBlobsContext(event: HandlerEvent): void {
+  if ((event as HandlerEvent & { blobs?: string }).blobs) {
+    connectLambda(event);
+  }
 }
 
 /** Get the Netlify Blobs store for RSVP data */
@@ -51,4 +58,10 @@ export async function listRsvps(): Promise<StoredRsvp[]> {
   }
 
   return results;
+}
+
+/** Summarize who is attending for admin display */
+export function formatGuestResponses(responses: GuestResponse[] | undefined): string {
+  if (!responses?.length) return '';
+  return responses.map((g) => `${g.name}: ${g.attending ? 'Yes' : 'No'}`).join('; ');
 }

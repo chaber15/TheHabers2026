@@ -12,6 +12,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   <section class="section">
     <div class="container admin-panel">
+      <p id="admin-dev-hint" class="admin-dev-hint" hidden>
+        Local tip: use <a href="http://localhost:8888/admin/">localhost:8888/admin</a> while running
+        <code>npm run dev:netlify</code>.
+      </p>
+
       <div id="admin-login" class="card admin-login">
         <div class="form-group">
           <label for="admin-password">Password</label>
@@ -34,8 +39,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 <th>Size</th>
                 <th>Code</th>
                 <th>Status</th>
-                <th>Attending</th>
                 <th>Count</th>
+                <th>Guests</th>
                 <th>Dietary</th>
               </tr>
             </thead>
@@ -48,7 +53,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  import { ADMIN_TOKEN_KEY, API_ADMIN } from '../utils/constants.ts';
+  import { ADMIN_TOKEN_KEY, API_ADMIN, apiUrl, getApiBase } from '../utils/constants.ts';
 
   const loginEl = document.getElementById('admin-login');
   const dashboardEl = document.getElementById('admin-dashboard');
@@ -59,10 +64,25 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const logoutBtn = document.getElementById('logout-btn');
   const tableBody = document.querySelector('#rsvp-table tbody');
 
+  /** Parse JSON or surface HTML/empty error pages from misconfigured dev ports */
+  async function parseApiResponse(response) {
+    const text = await response.text();
+    try {
+      return { data: JSON.parse(text), raw: text };
+    } catch {
+      if (getApiBase()) {
+        throw new Error(
+          'API not reachable. Open http://localhost:8888/admin or keep npm run dev:netlify running.'
+        );
+      }
+      throw new Error('Server returned an invalid response. Try again or check the deploy logs.');
+    }
+  }
+
   /** Fetch with admin bearer token */
   async function adminFetch(action) {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
-    return fetch(`${API_ADMIN}?action=${action}`, {
+    return fetch(`${apiUrl(API_ADMIN)}?action=${action}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
@@ -77,8 +97,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <td>${party.partySize}</td>
           <td><code>${party.accessCode}</code></td>
           <td>${party.rsvpStatus}</td>
-          <td>${party.attending === null ? '—' : party.attending ? 'Yes' : 'No'}</td>
           <td>${party.attendeeCount ?? '—'}</td>
+          <td class="guest-responses-cell">${party.guestResponses || '—'}</td>
           <td>${party.dietaryNotes || '—'}</td>
         </tr>
       `
@@ -88,18 +108,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   /** Load dashboard data */
   async function loadDashboard() {
-    const response = await adminFetch('list');
-    if (!response.ok) {
+    try {
+      const response = await adminFetch('list');
+      const { data } = await parseApiResponse(response);
+
+      if (!response.ok) {
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        loginEl.hidden = false;
+        dashboardEl.hidden = true;
+        loginError.textContent = data.error ?? 'Session expired. Please sign in again.';
+        loginError.hidden = false;
+        return;
+      }
+
+      renderTable(data.parties);
+      loginEl.hidden = true;
+      dashboardEl.hidden = false;
+      loginError.hidden = true;
+    } catch (err) {
       sessionStorage.removeItem(ADMIN_TOKEN_KEY);
       loginEl.hidden = false;
       dashboardEl.hidden = true;
-      return;
+      loginError.textContent = err.message ?? 'Unable to connect.';
+      loginError.hidden = false;
     }
-
-    const data = await response.json();
-    renderTable(data.parties);
-    loginEl.hidden = true;
-    dashboardEl.hidden = false;
   }
 
   /** Handle admin login */
@@ -107,13 +139,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     loginError.hidden = true;
 
     try {
-      const response = await fetch(`${API_ADMIN}?action=login`, {
+      const response = await fetch(`${apiUrl(API_ADMIN)}?action=login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: passwordInput.value }),
       });
 
-      const data = await response.json();
+      const { data } = await parseApiResponse(response);
 
       if (!response.ok) {
         loginError.textContent = data.error ?? 'Login failed.';
@@ -123,8 +155,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
       await loadDashboard();
-    } catch {
-      loginError.textContent = 'Unable to connect.';
+    } catch (err) {
+      loginError.textContent = err.message ?? 'Unable to connect.';
       loginError.hidden = false;
     }
   });
@@ -152,6 +184,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     passwordInput.value = '';
   });
 
+  const devHint = document.getElementById('admin-dev-hint');
+  if (devHint && getApiBase()) {
+    devHint.hidden = false;
+  }
+
   // Restore session if token exists
   if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) {
     loadDashboard();
@@ -161,6 +198,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <style>
   .admin-panel {
     max-width: 960px;
+  }
+
+  .admin-dev-hint {
+    max-width: 520px;
+    margin: 0 auto var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.9rem;
+    color: var(--color-warm-gray);
+    background: var(--color-ivory);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+  }
+
+  .admin-dev-hint code {
+    font-size: 0.85em;
   }
 
   .admin-login {
@@ -207,5 +260,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     background: var(--color-ivory);
     padding: 2px 6px;
     border-radius: var(--radius-sm);
+  }
+
+  .guest-responses-cell {
+    font-size: 0.8rem;
+    max-width: 280px;
+    white-space: normal;
   }
 </style>
