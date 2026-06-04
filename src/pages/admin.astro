@@ -1,0 +1,211 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Admin" description="RSVP admin dashboard." skipGate={true} polaroidDecor={false}>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Admin Dashboard</h1>
+      <p>Guest RSVP overview</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container admin-panel">
+      <div id="admin-login" class="card admin-login">
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input id="admin-password" class="form-input" type="password" autocomplete="current-password" />
+        </div>
+        <button type="button" class="btn btn-primary" id="admin-login-btn">Sign In</button>
+        <p class="form-error" id="login-error" hidden></p>
+      </div>
+
+      <div id="admin-dashboard" class="admin-dashboard" hidden>
+        <div class="admin-toolbar">
+          <button type="button" class="btn btn-secondary" id="export-btn">Export CSV</button>
+          <button type="button" class="btn btn-secondary" id="logout-btn">Sign Out</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="rsvp-table">
+            <thead>
+              <tr>
+                <th>Party</th>
+                <th>Size</th>
+                <th>Code</th>
+                <th>Status</th>
+                <th>Attending</th>
+                <th>Count</th>
+                <th>Dietary</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { ADMIN_TOKEN_KEY, API_ADMIN } from '../utils/constants.ts';
+
+  const loginEl = document.getElementById('admin-login');
+  const dashboardEl = document.getElementById('admin-dashboard');
+  const passwordInput = document.getElementById('admin-password');
+  const loginBtn = document.getElementById('admin-login-btn');
+  const loginError = document.getElementById('login-error');
+  const exportBtn = document.getElementById('export-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const tableBody = document.querySelector('#rsvp-table tbody');
+
+  /** Fetch with admin bearer token */
+  async function adminFetch(action) {
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    return fetch(`${API_ADMIN}?action=${action}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  /** Render RSVP table rows */
+  function renderTable(parties) {
+    tableBody.innerHTML = parties
+      .map(
+        (party) => `
+        <tr>
+          <td>${party.partyName}</td>
+          <td>${party.partySize}</td>
+          <td><code>${party.accessCode}</code></td>
+          <td>${party.rsvpStatus}</td>
+          <td>${party.attending === null ? '—' : party.attending ? 'Yes' : 'No'}</td>
+          <td>${party.attendeeCount ?? '—'}</td>
+          <td>${party.dietaryNotes || '—'}</td>
+        </tr>
+      `
+      )
+      .join('');
+  }
+
+  /** Load dashboard data */
+  async function loadDashboard() {
+    const response = await adminFetch('list');
+    if (!response.ok) {
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+      loginEl.hidden = false;
+      dashboardEl.hidden = true;
+      return;
+    }
+
+    const data = await response.json();
+    renderTable(data.parties);
+    loginEl.hidden = true;
+    dashboardEl.hidden = false;
+  }
+
+  /** Handle admin login */
+  loginBtn?.addEventListener('click', async () => {
+    loginError.hidden = true;
+
+    try {
+      const response = await fetch(`${API_ADMIN}?action=login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: passwordInput.value }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        loginError.textContent = data.error ?? 'Login failed.';
+        loginError.hidden = false;
+        return;
+      }
+
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+      await loadDashboard();
+    } catch {
+      loginError.textContent = 'Unable to connect.';
+      loginError.hidden = false;
+    }
+  });
+
+  /** Export CSV download */
+  exportBtn?.addEventListener('click', async () => {
+    const response = await adminFetch('export');
+    if (!response.ok) return;
+
+    const csv = await response.text();
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'rsvp-export.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /** Clear session and show login */
+  logoutBtn?.addEventListener('click', () => {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    loginEl.hidden = false;
+    dashboardEl.hidden = true;
+    passwordInput.value = '';
+  });
+
+  // Restore session if token exists
+  if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) {
+    loadDashboard();
+  }
+</script>
+
+<style>
+  .admin-panel {
+    max-width: 960px;
+  }
+
+  .admin-login {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .admin-toolbar {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .admin-table-wrap {
+    overflow-x: auto;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 12px rgba(44, 44, 44, 0.06);
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .admin-table th {
+    background: var(--color-ivory);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .admin-table code {
+    font-size: 0.85rem;
+    background: var(--color-ivory);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+  }
+</style>

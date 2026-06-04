@@ -1,0 +1,115 @@
+---
+interface Props {
+  /** ISO date string, e.g. 2026-10-03 */
+  weddingDate: string;
+  /** Compact style for the home hero invite card (no extra divider lines) */
+  variant?: 'default' | 'compact';
+}
+
+const { weddingDate, variant = 'default' } = Astro.props;
+---
+
+<p
+  class:list={['wedding-countdown', variant === 'compact' && 'wedding-countdown--compact']}
+  data-wedding-date={weddingDate}
+  aria-live="polite"
+>
+  <span class="countdown-label">Counting down</span>
+  <span class="countdown-value">...</span>
+</p>
+
+<script>
+  /** Update countdown text from the wedding date on the element */
+  function initCountdown(el) {
+    const dateStr = el.dataset.weddingDate;
+    if (!dateStr) return;
+
+    const wedding = new Date(`${dateStr}T00:00:00`);
+    const valueEl = el.querySelector('.countdown-value');
+    const labelEl = el.querySelector('.countdown-label');
+    if (!valueEl || !labelEl) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const diffMs = wedding.getTime() - today.getTime();
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    if (days > 1) {
+      labelEl.textContent = 'Counting down';
+      valueEl.textContent = `${days} days until we say I do`;
+    } else if (days === 1) {
+      labelEl.textContent = 'Almost here';
+      valueEl.textContent = 'Tomorrow is the day';
+    } else if (days === 0) {
+      labelEl.textContent = 'Today';
+      valueEl.textContent = 'Today is our wedding day';
+    } else {
+      labelEl.textContent = 'Thank you';
+      valueEl.textContent = 'We loved celebrating with you';
+    }
+  }
+
+  document.querySelectorAll('.wedding-countdown').forEach(initCountdown);
+</script>
+
+<style>
+  .wedding-countdown {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin: var(--space-md) 0;
+    padding: var(--space-sm) 0;
+    text-align: center;
+  }
+
+  .wedding-countdown::before,
+  .wedding-countdown::after {
+    content: '';
+    width: 48px;
+    height: 1px;
+    background: var(--color-dusty-rose);
+    opacity: 0.85;
+  }
+
+  .wedding-countdown::before {
+    margin-bottom: var(--space-sm);
+  }
+
+  .wedding-countdown::after {
+    margin-top: var(--space-sm);
+  }
+
+  .wedding-countdown--compact {
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    gap: 0.2em;
+  }
+
+  .wedding-countdown--compact::before,
+  .wedding-countdown--compact::after {
+    display: none;
+  }
+
+  .wedding-countdown--compact .countdown-value {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+  }
+
+  .countdown-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-sage-dark);
+  }
+
+  .countdown-value {
+    max-width: 16rem;
+    font-family: var(--font-heading);
+    font-size: clamp(1.15rem, 2.5vw, 1.35rem);
+    letter-spacing: 0.03em;
+    color: var(--color-charcoal);
+    text-wrap: balance;
+  }
+</style>

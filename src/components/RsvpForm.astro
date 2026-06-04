@@ -1,0 +1,50 @@
+---
+---
+
+<div id="rsvp-form-root" class="rsvp-container"></div>
+
+<script>
+  import { initRsvpForm } from './rsvp-form.js';
+
+  const root = document.getElementById('rsvp-form-root');
+  if (root) initRsvpForm(root);
+</script>
+
+<style>
+  .rsvp-container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .rsvp-intro,
+  .rsvp-greeting {
+    color: var(--color-warm-gray);
+    margin-bottom: var(--space-md);
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .rsvp-confirmation {
+    text-align: center;
+  }
+
+  .rsvp-confirmation h2 {
+    color: var(--color-sage-dark);
+  }
+</style>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Placeholder couple photo">
+  <rect width="800" height="1000" fill="#FAF7F2"/>
+  <rect x="40" y="40" width="720" height="920" fill="#FFFFFF" stroke="#E8E4DE" stroke-width="2"/>
+  <circle cx="400" cy="380" r="120" fill="#C9A79A" opacity="0.35"/>
+  <circle cx="320" cy="420" r="80" fill="#8A9E85" opacity="0.25"/>
+  <circle cx="480" cy="420" r="80" fill="#8A9E85" opacity="0.25"/>
+  <text x="400" y="620" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#2C2C2C">Caleb &amp; Emma</text>
+  <text x="400" y="670" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#7A7A7A">Photo placeholder</text>
+</svg>

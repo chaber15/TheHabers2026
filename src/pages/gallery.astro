@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import story from '../../data/story.json';
+import PhotoGallery from '../components/PhotoGallery.astro';
+import { getPhotoManifest } from '../utils/photos';
+
+const photos = getPhotoManifest();
+---
+
+<BaseLayout
+  title="Our Story"
+  description="Caleb and Emma's story and photo gallery."
+  polaroidDecor={false}
+>
+  <section class="story-gallery">
+    <div class="container story-gallery__intro">
+      <h1>Our Story</h1>
+      <p class="story-gallery__text">{story.intro}</p>
+    </div>
+
+    <div class="container">
+      <PhotoGallery photos={photos} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .story-gallery {
+    padding: var(--space-xl) 0 var(--space-2xl);
+    background: var(--color-ivory);
+  }
+
+  .story-gallery__intro {
+    max-width: var(--prose-width);
+    margin: 0 auto var(--space-xl);
+    text-align: center;
+  }
+
+  .story-gallery__intro h1 {
+    margin-bottom: var(--space-md);
+  }
+
+  .story-gallery__text {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-warm-gray);
+    text-wrap: pretty;
+  }
+</style>

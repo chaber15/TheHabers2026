@@ -1,0 +1,33 @@
+{
+  "couple": {
+    "displayName": "Caleb & Emma",
+    "shortName": "C & E",
+    "partner1": "Caleb Haber",
+    "partner2": "Emma Vanden Berg"
+  },
+  "wedding": {
+    "date": "2026-10-03",
+    "formattedDate": "October 3, 2026",
+    "dayOfWeek": "Saturday"
+  },
+  "venue": {
+    "name": "Good Hope Presbyterian Church",
+    "address": "12131 Scaggsville Rd",
+    "city": "Highland",
+    "state": "MD",
+    "zip": "20777",
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=12131+Scaggsville+Rd,+Highland,+MD+20777"
+  },
+  "receptionVenue": {
+    "name": "Mt Zion United Methodist Church",
+    "space": "Outdoor Pavilion",
+    "address": "12430 Scaggsville Rd",
+    "city": "Highland",
+    "state": "MD",
+    "zip": "20777",
+    "mapUrl": "https://www.google.com/maps/search/?api=1&query=12430+Scaggsville+Rd,+Highland,+MD+20777"
+  },
+  "meta": {
+    "description": "Join Caleb and Emma as they celebrate their wedding on October 3, 2026 at Good Hope Presbyterian Church."
+  }
+}

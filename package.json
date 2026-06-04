@@ -1,0 +1,28 @@
+{
+  "name": "caleb-emma-wedding",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "sync-photos": "node scripts/sync-photos.js",
+    "predev": "npm run sync-photos",
+    "prebuild": "npm run sync-photos",
+    "dev": "astro dev",
+    "dev:netlify": "netlify dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "guests": "node scripts/manage-guests.js"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^7.0.11",
+    "@netlify/blobs": "^10.7.9",
+    "astro": "^6.4.2"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^4.2.3",
+    "netlify-cli": "^23.0.0"
+  }
+}

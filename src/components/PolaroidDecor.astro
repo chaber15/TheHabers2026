@@ -1,0 +1,218 @@
+---
+import {
+  getPhotoManifest,
+  getLandingPhoto,
+  getDecorPhotoPool,
+  pickDecorPhotos,
+  pickDecorByIds,
+  pinDecorPhotos,
+  type DecorPin,
+} from '../utils/photos';
+
+interface Props {
+  /** Rotates which photos appear (e.g. page path) */
+  seed?: string;
+  /** Polaroids on each side — tuned per page length */
+  perSide?: number;
+}
+
+const { seed = 'decor', perSide = 3 } = Astro.props;
+
+/** Per-page filenames to skip in side polaroids (partial match on filename) */
+const DECOR_EXCLUDE: Record<string, string[]> = {
+  '/wedding-party': ['1282'],
+  '/schedule': ['1282'],
+};
+
+/** Fixed side-decor lineup (2264 replaces flower shot 1718 on wedding party) */
+const DECOR_PANEL_IDS: Record<string, string[]> = {
+  '/wedding-party': ['1236', '1382', '1482', '2264', '1723', '1936'],
+};
+
+/** Per-page pinned polaroids — side, slot index, filename fragment */
+const DECOR_PIN: Record<string, DecorPin[]> = {
+  '/schedule': [{ side: 'right', index: 0, filename: '1718' }],
+};
+
+const photos = getPhotoManifest();
+const landingPhoto = getLandingPhoto(photos);
+const pool = getDecorPhotoPool(photos, landingPhoto);
+const total = Math.max(0, perSide * 2);
+const panelIds = DECOR_PANEL_IDS[seed];
+const decorPhotos = panelIds
+  ? pickDecorByIds(pool, panelIds)
+  : pinDecorPhotos(
+      pickDecorPhotos(pool, total, seed, DECOR_EXCLUDE[seed] ?? []),
+      perSide,
+      DECOR_PIN[seed] ?? [],
+      pool
+    );
+const leftPhotos = decorPhotos.slice(0, perSide);
+const rightPhotos = decorPhotos.slice(perSide, total);
+
+/** Vertical slot as % down the side column (spread between top and bottom) */
+function slotTop(index: number, count: number, seed: string): number {
+  if (count <= 1) return 50;
+  if (count === 2) {
+    if (seed.includes('rsvp')) return [22, 72][index] ?? 50;
+    return [26, 74][index] ?? 50;
+  }
+  if (count === 3) {
+    let slots = [28, 50, 72];
+    if (seed.includes('faq')) slots = [20, 50, 80];
+    else if (seed.includes('wedding-party')) slots = [24, 50, 76];
+    return slots[index] ?? 50;
+  }
+  const inset = 12;
+  const span = 100 - inset * 2;
+  return inset + (span / (count - 1)) * index;
+}
+
+/** Slight alternating tilts so the strip feels hand-placed */
+function tiltFor(index: number, side: 'left' | 'right'): number {
+  const leftTilts = [-7, 4, -3, 5, -5, 3];
+  const rightTilts = [6, -5, 3, -4, 4, -6];
+  const tilts = side === 'left' ? leftTilts : rightTilts;
+  return tilts[index % tilts.length];
+}
+
+function frameStyle(index: number, count: number, side: 'left' | 'right'): string {
+  return `top: ${slotTop(index, count, seed)}%; --tilt: ${tiltFor(index, side)}deg`;
+}
+
+/** Per-photo crop overrides inside polaroid frames */
+function cropClass(filename: string): string | undefined {
+  if (filename.includes('1936')) return 'polaroid-decor__img--top';
+  if (filename.includes('1718')) return 'polaroid-decor__img--right';
+  return undefined;
+}
+---
+
+{
+  decorPhotos.length > 0 && (
+    <div
+      class="polaroid-decor"
+      data-per-side={perSide}
+      aria-hidden="true"
+    >
+      <div class="polaroid-decor__side polaroid-decor__side--left">
+        {
+          leftPhotos.map((photo, index) => (
+            <figure
+              class="polaroid-decor__frame"
+              style={frameStyle(index, leftPhotos.length, 'left')}
+            >
+              <img
+                src={photo.src}
+                alt=""
+                loading="lazy"
+                width="240"
+                height="300"
+                class:list={[cropClass(photo.filename)]}
+              />
+            </figure>
+          ))
+        }
+      </div>
+      <div class="polaroid-decor__side polaroid-decor__side--right">
+        {
+          rightPhotos.map((photo, index) => (
+            <figure
+              class="polaroid-decor__frame"
+              style={frameStyle(index, rightPhotos.length, 'right')}
+            >
+              <img
+                src={photo.src}
+                alt=""
+                loading="lazy"
+                width="240"
+                height="300"
+                class:list={[cropClass(photo.filename)]}
+              />
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .polaroid-decor {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .polaroid-decor {
+      display: block;
+      position: absolute;
+      top: var(--page-hero-band);
+      right: 0;
+      bottom: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: visible;
+    }
+
+    .polaroid-decor__side {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: clamp(7rem, 11vw, 9.5rem);
+      padding-top: var(--space-md);
+      box-sizing: border-box;
+    }
+
+    .polaroid-decor__side--left {
+      left: clamp(0.35rem, 1.2vw, 1.25rem);
+    }
+
+    .polaroid-decor__side--right {
+      right: clamp(0.35rem, 1.2vw, 1.25rem);
+    }
+
+    .polaroid-decor__frame {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 4px 4px 12px;
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 2px;
+      box-shadow: 0 5px 18px rgba(42, 40, 38, 0.12);
+      transform: translateY(-50%) rotate(var(--tilt, -4deg));
+    }
+
+    .polaroid-decor__frame img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      object-position: center center;
+    }
+
+    .polaroid-decor__img--top {
+      object-position: top center;
+    }
+
+    .polaroid-decor__img--right {
+      object-position: right 35%;
+    }
+  }
+
+  @media (min-width: 1500px) {
+    .polaroid-decor__side {
+      width: clamp(8rem, 10vw, 10.5rem);
+    }
+
+    .polaroid-decor__side--left {
+      left: clamp(0.75rem, 2vw, 2rem);
+    }
+
+    .polaroid-decor__side--right {
+      right: clamp(0.75rem, 2vw, 2rem);
+    }
+  }
+</style>

@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import weddingParty from '../../data/wedding-party.json';
+---
+
+<BaseLayout title="Wedding Party" description="Meet Caleb and Emma's wedding party." polaroidsPerSide={3}>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Wedding Party</h1>
+      <p>The friends and family standing with us :&rpar;</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container party-roster">
+      <div class="party-roster__columns" aria-label="Bride's party and groom's party">
+        <div class="party-roster__head">
+          <div class="party-roster__cell party-roster__cell--bride">
+            <p class="party-roster__name">{weddingParty.couple.bride.name}</p>
+            <p class="party-roster__title">{weddingParty.couple.bride.title}</p>
+          </div>
+          <div class="party-roster__cell party-roster__cell--groom">
+            <p class="party-roster__name">{weddingParty.couple.groom.name}</p>
+            <p class="party-roster__title">{weddingParty.couple.groom.title}</p>
+          </div>
+        </div>
+
+        {
+          weddingParty.party.map((row) => (
+            <div class="party-roster__row">
+              <div class="party-roster__cell party-roster__cell--bride">
+                <p class="party-roster__name">{row.brideSide.name}</p>
+                <p class="party-roster__title">{row.brideSide.title}</p>
+              </div>
+              <div class="party-roster__cell party-roster__cell--groom">
+                <p class="party-roster__name">{row.groomSide.name}</p>
+                <p class="party-roster__title">{row.groomSide.title}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="party-roster__parents">
+        <h2 class="party-roster__parents-heading">Parents</h2>
+        <div class="party-roster__columns">
+          {
+            weddingParty.parents.map((row) => (
+              <div class="party-roster__row">
+                <div class="party-roster__cell party-roster__cell--bride">
+                  <p class="party-roster__name">{row.brideSide.name}</p>
+                  <p class="party-roster__title">{row.brideSide.title}</p>
+                </div>
+                <div class="party-roster__cell party-roster__cell--groom">
+                  <p class="party-roster__name">{row.groomSide.name}</p>
+                  <p class="party-roster__title">{row.groomSide.title}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .party-roster {
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+
+  .party-roster__columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .party-roster__head,
+  .party-roster__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    align-items: start;
+  }
+
+  .party-roster__head {
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .party-roster__head .party-roster__name {
+    font-family: var(--font-heading);
+    font-size: clamp(1.35rem, 3vw, 1.65rem);
+  }
+
+  .party-roster__cell {
+    text-align: center;
+    padding: var(--space-sm) var(--space-xs);
+  }
+
+  .party-roster__name {
+    margin: 0 0 0.2em;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--color-charcoal);
+  }
+
+  .party-roster__title {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-sage-dark);
+    letter-spacing: 0.02em;
+  }
+
+  .party-roster__parents {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .party-roster__parents-heading {
+    text-align: center;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    margin: 0 0 var(--space-lg);
+  }
+
+  @media (min-width: 640px) {
+    .party-roster__columns {
+      gap: var(--space-lg);
+    }
+
+    .party-roster__head,
+    .party-roster__row {
+      gap: var(--space-xl);
+    }
+  }
+</style>

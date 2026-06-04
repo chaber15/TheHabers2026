@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Placeholder couple photo">
+  <rect width="800" height="600" fill="#EDE8E1"/>
+  <rect x="40" y="40" width="720" height="520" fill="#FFFFFF" stroke="#E8E4DE" stroke-width="2"/>
+  <path d="M200 420 Q400 180 600 420" fill="none" stroke="#C9A79A" stroke-width="3" opacity="0.6"/>
+  <text x="400" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#2C2C2C">Gallery</text>
+</svg>

@@ -1,0 +1,183 @@
+---
+import site from '../../data/site.json';
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/schedule', label: 'Schedule' },
+  { href: '/gallery', label: 'Our Story' },
+  { href: '/wedding-party', label: 'Wedding Party' },
+  { href: '/registry', label: 'Registry' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/rsvp', label: 'RSVP' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <span class="logo-full">{site.couple.displayName}</span>
+      <span class="logo-short">{site.couple.shortName}</span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="site-nav" aria-label="Main navigation">
+      <ul>
+        {
+          navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class:list={[{ active: currentPath === link.href }]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(248, 245, 240, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--nav-height);
+    gap: var(--space-md);
+  }
+
+  .logo {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: var(--color-charcoal);
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .logo:hover {
+    color: var(--color-sage-dark);
+  }
+
+  .logo-short {
+    display: none;
+  }
+
+  .site-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-md) var(--space-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-nav a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--color-warm-gray);
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid transparent;
+    transition: all var(--transition);
+  }
+
+  .site-nav a:hover,
+  .site-nav a.active {
+    color: var(--color-charcoal);
+    border-bottom-color: var(--color-dusty-rose);
+  }
+
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm);
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--color-charcoal);
+    transition: all var(--transition);
+  }
+
+  @media (max-width: 900px) {
+    .logo-full {
+      display: none;
+    }
+
+    .logo-short {
+      display: inline;
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: flex;
+    }
+
+    .site-nav {
+      position: absolute;
+      top: var(--nav-height);
+      left: 0;
+      right: 0;
+      background: var(--color-ivory);
+      border-bottom: 1px solid var(--color-border);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition);
+    }
+
+    .site-nav.open {
+      max-height: 420px;
+    }
+
+    .site-nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      padding: var(--space-md) var(--space-lg);
+      gap: var(--space-sm);
+    }
+
+    .site-nav a {
+      display: block;
+      padding: var(--space-sm) 0;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.site-nav');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = nav?.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(!!isOpen));
+  });
+</script>

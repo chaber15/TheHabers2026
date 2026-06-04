@@ -1,0 +1,43 @@
+{
+  "parties": [
+    {
+      "id": "demo-001",
+      "partyName": "The Demo Family",
+      "partySize": 2,
+      "accessCode": "DEMO01",
+      "zip": "00000",
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "demo-002",
+      "partyName": "Alex & Jordan Lee",
+      "partySize": 2,
+      "accessCode": "DEMO02",
+      "zip": "00000",
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    },
+    {
+      "id": "caleb-test-party",
+      "partyName": "Caleb Test Party",
+      "partySize": 2,
+      "accessCode": "WG2W44",
+      "zip": "12345",
+      "rsvpStatus": "pending",
+      "rsvpSubmittedAt": null,
+      "attending": null,
+      "attendeeCount": null,
+      "dietaryNotes": null,
+      "message": null
+    }
+  ]
+}

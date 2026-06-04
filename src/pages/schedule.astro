@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import site from '../../data/site.json';
+import schedule from '../../data/schedule.json';
+---
+
+<BaseLayout
+  title="Schedule & Details"
+  description="Wedding day timeline and venue information."
+  polaroidsPerSide={5}
+>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Schedule & Details</h1>
+      <p>{site.wedding.formattedDate}, {site.venue.name}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="timeline">
+        {
+          schedule.events.map((event) => (
+            <article class="timeline-item">
+              <time class="timeline-time">{event.time}</time>
+              <div class="timeline-body">
+                <h3>{event.title}</h3>
+                <p>{event.description}</p>
+                <p class="timeline-location">{event.location}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="venue-panels">
+        <div class="venue-panel">
+          <h2>Ceremony</h2>
+          <p class="venue-name">{site.venue.name}</p>
+          <p>
+            {site.venue.address}<br />
+            {site.venue.city}, {site.venue.state} {site.venue.zip}
+          </p>
+          <a href={site.venue.mapUrl} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            View on map
+          </a>
+        </div>
+
+        <div class="venue-panel">
+          <h2>Reception</h2>
+          <p class="venue-name">{site.receptionVenue.name}</p>
+          <p class="venue-space">{site.receptionVenue.space}</p>
+          <p>
+            {site.receptionVenue.address}<br />
+            {site.receptionVenue.city}, {site.receptionVenue.state} {site.receptionVenue.zip}
+          </p>
+          <a href={site.receptionVenue.mapUrl} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            View on map
+          </a>
+        </div>
+      </div>
+
+      <ul class="schedule-notes">
+        {schedule.notes.map((note) => <li>{note}</li>)}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

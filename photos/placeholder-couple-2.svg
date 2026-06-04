@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Placeholder couple photo">
+  <rect width="800" height="1000" fill="#F5F0EA"/>
+  <rect x="40" y="40" width="720" height="920" fill="#FFFFFF" stroke="#E8E4DE" stroke-width="2"/>
+  <rect x="120" y="200" width="560" height="400" rx="16" fill="#8A9E85" opacity="0.2"/>
+  <text x="400" y="720" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#2C2C2C">Our Story</text>
+  <text x="400" y="765" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#7A7A7A">Replace with your photo</text>
+</svg>

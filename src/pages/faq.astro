@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import faq from '../../data/faq.json';
+---
+
+<BaseLayout title="FAQ" description="Frequently asked questions about Caleb and Emma's wedding." polaroidsPerSide={3}>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Questions & Answers</h1>
+      <p>Practical details for our wedding day.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container faq-list">
+      {
+        faq.entries.map((entry) => (
+          <details class="faq-item">
+            <summary>{entry.question}</summary>
+            <p>{entry.answer}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

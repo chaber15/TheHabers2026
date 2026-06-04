@@ -1,0 +1,44 @@
+---
+import site from '../../data/site.json';
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-names">{site.couple.displayName}</p>
+    <p class="footer-date">
+      {site.wedding.formattedDate}, {site.venue.name}
+    </p>
+    <p class="footer-note">We can't wait to celebrate with you!</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-ivory-deep);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-xl) 0 var(--space-lg);
+    text-align: center;
+  }
+
+  .footer-names {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 1.85rem);
+    margin-bottom: var(--space-sm);
+    font-weight: 400;
+  }
+
+  .footer-date {
+    color: var(--color-warm-gray);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .footer-note {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--color-sage-dark);
+    margin: 0;
+  }
+</style>

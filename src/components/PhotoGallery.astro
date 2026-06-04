@@ -1,0 +1,63 @@
+---
+import type { PhotoEntry } from '../utils/photos';
+
+interface Props {
+  photos: PhotoEntry[];
+}
+
+const { photos } = Astro.props;
+---
+
+<div class="photo-gallery">
+  {
+    photos.map((photo) => (
+      <figure class="gallery-item">
+        <img src={photo.src} alt={photo.alt} loading="lazy" width="800" height="600" />
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .gallery-item {
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--transition);
+  }
+
+  @media (hover: hover) {
+    .gallery-item:hover img {
+      transform: scale(1.02);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .photo-gallery {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .gallery-item:first-child {
+      grid-column: span 2;
+    }
+
+    .gallery-item:first-child img {
+      aspect-ratio: 21 / 9;
+    }
+  }
+</style>

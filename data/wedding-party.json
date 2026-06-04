@@ -1,0 +1,38 @@
+{
+  "couple": {
+    "bride": { "name": "Emma Vanden Berg", "title": "Bride" },
+    "groom": { "name": "Caleb Haber", "title": "Groom" }
+  },
+  "party": [
+    {
+      "brideSide": { "name": "Jenna Vanden Berg", "title": "Maid of Honor" },
+      "groomSide": { "name": "Marcus Hadeed", "title": "Best Man" }
+    },
+    {
+      "brideSide": { "name": "Hannah Haber", "title": "Bridesmaid" },
+      "groomSide": { "name": "Jack Hadeed", "title": "Best Man" }
+    },
+    {
+      "brideSide": { "name": "Grace Haber", "title": "Bridesmaid" },
+      "groomSide": { "name": "Jonathan McIntosh", "title": "Groomsman" }
+    },
+    {
+      "brideSide": { "name": "Michelle Ameyaw", "title": "Bridesmaid" },
+      "groomSide": { "name": "Tom Mygatt", "title": "Groomsman" }
+    },
+    {
+      "brideSide": { "name": "Lizzie Walker", "title": "Bridesmaid" },
+      "groomSide": { "name": "Darrel Bossman", "title": "Groomsman" }
+    }
+  ],
+  "parents": [
+    {
+      "brideSide": { "name": "Amy Vanden Berg", "title": "Mother of the Bride" },
+      "groomSide": { "name": "Kate Haber", "title": "Mother of the Groom" }
+    },
+    {
+      "brideSide": { "name": "Michael Vanden Berg", "title": "Father of the Bride" },
+      "groomSide": { "name": "Joseph Haber", "title": "Father of the Groom" }
+    }
+  ]
+}

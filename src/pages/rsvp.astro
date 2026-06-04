@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RsvpForm from '../components/RsvpForm.astro';
+---
+
+<BaseLayout title="RSVP" description="RSVP for Caleb and Emma's wedding." polaroidsPerSide={2}>
+  <section class="page-hero">
+    <div class="container">
+      <h1>RSVP</h1>
+      <p>Please respond by September 1, 2026</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <RsvpForm />
+    </div>
+  </section>
+</BaseLayout>

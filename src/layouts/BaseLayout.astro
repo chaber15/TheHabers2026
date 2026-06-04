@@ -1,0 +1,84 @@
+---
+import '../styles/globals.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import WordleGate from '../components/WordleGate.astro';
+import PolaroidDecor from '../components/PolaroidDecor.astro';
+import site from '../../data/site.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Admin page skips the Wordle gate */
+  skipGate?: boolean;
+  /** Side polaroid decorations on inner pages (off for home and admin) */
+  polaroidDecor?: boolean;
+  /** How many polaroids per side (set per page based on content length) */
+  polaroidsPerSide?: number;
+}
+
+const {
+  title = site.couple.displayName,
+  description = site.meta.description,
+  skipGate = false,
+  polaroidDecor = true,
+  polaroidsPerSide = 3,
+} = Astro.props;
+
+const pageTitle = title === site.couple.displayName ? title : `${title} · ${site.couple.shortName}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <title>{pageTitle}</title>
+    {
+      !skipGate && (
+        <>
+          {/* Hide page content until the gate decides, to avoid a flash of the site */}
+          <style>{`html.gate-locked body > *:not(#wordle-gate-root):not(.wordle-overlay) { visibility: hidden; }`}</style>
+          <script is:inline>
+            {`if (localStorage.getItem('wg_unlocked') !== 'true') { document.documentElement.classList.add('gate-locked'); }`}
+          </script>
+        </>
+      )
+    }
+  </head>
+  <body>
+    {!skipGate && <WordleGate />}
+    <Nav />
+    <main class="site-main">
+      {
+        polaroidDecor && (
+          <PolaroidDecor seed={Astro.url.pathname} perSide={polaroidsPerSide} />
+        )
+      }
+      <div class="site-main__content">
+        <slot />
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  /* Polaroids scroll with main, behind page content (including .page-hero) */
+  .site-main {
+    position: relative;
+  }
+
+  .site-main__content {
+    position: relative;
+    z-index: 102;
+  }
+</style>

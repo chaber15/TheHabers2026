@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import registry from '../../data/registry.json';
+---
+
+<BaseLayout title="Registry" description="Caleb and Emma's wedding registry." polaroidsPerSide={2}>
+  <section class="page-hero">
+    <div class="container prose">
+      <h1>Registry</h1>
+      <p>{registry.message}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container registry-list">
+      {
+        registry.registries.map((item) => (
+          <article class="card registry-card">
+            <h2>{item.name}</h2>
+            <p>{item.description}</p>
+            <a href={item.url} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+              View registry
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
