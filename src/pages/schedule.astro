@@ -1,9 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ComingSoon from '../components/ComingSoon.astro';
+import { isPageAvailable } from '../config/page-availability';
 import site from '../../data/site.json';
 import schedule from '../../data/schedule.json';
 ---
 
+{
+  !isPageAvailable('schedule') ? (
+    <ComingSoon
+      title="Schedule & Details"
+      heading="Schedule & Details"
+      description="Our day-of timeline and venue details are on the way. For now, RSVP and explore the rest of the site."
+    />
+  ) : (
 <BaseLayout
   title="Schedule & Details"
   description="Wedding day timeline and venue information."
@@ -66,3 +76,5 @@ import schedule from '../../data/schedule.json';
     </div>
   </section>
 </BaseLayout>
+  )
+}

@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  title: string;
+  heading: string;
+  description?: string;
+}
+
+const {
+  title,
+  heading,
+  description = 'We are still putting the finishing touches on this page. Check back soon!',
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} polaroidDecor={false}>
+  <section class="page-hero">
+    <div class="container">
+      <h1>{heading}</h1>
+      <p>Coming soon</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container coming-soon">
+      <p class="coming-soon__message">{description}</p>
+      <a href="/" class="btn btn-primary">Back to home</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .coming-soon {
+    max-width: var(--prose-width);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .coming-soon__message {
+    margin: 0 0 var(--space-lg);
+    color: var(--color-warm-gray);
+    line-height: 1.7;
+  }
+</style>

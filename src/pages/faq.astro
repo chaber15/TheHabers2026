@@ -1,8 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ComingSoon from '../components/ComingSoon.astro';
+import { isPageAvailable } from '../config/page-availability';
 import faq from '../../data/faq.json';
 ---
 
+{
+  !isPageAvailable('faq') ? (
+    <ComingSoon
+      title="FAQ"
+      heading="Questions & Answers"
+      description="Frequently asked questions for our wedding day are coming soon."
+    />
+  ) : (
 <BaseLayout title="FAQ" description="Frequently asked questions about Caleb and Emma's wedding." polaroidsPerSide={3}>
   <section class="page-hero">
     <div class="container">
@@ -24,3 +34,5 @@ import faq from '../../data/faq.json';
     </div>
   </section>
 </BaseLayout>
+  )
+}

@@ -1,15 +1,6 @@
 ---
 import site from '../../data/site.json';
-
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/schedule', label: 'Schedule' },
-  { href: '/gallery', label: 'Our Story' },
-  { href: '/wedding-party', label: 'Wedding Party' },
-  { href: '/registry', label: 'Registry' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/rsvp', label: 'RSVP' },
-];
+import { navLinks } from '../config/nav-links';
 
 const currentPath = Astro.url.pathname;
 ---

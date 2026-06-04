@@ -1,0 +1,12 @@
+/** Flip to `true` when a page is ready to publish */
+export const PAGE_AVAILABLE = {
+  schedule: false,
+  gallery: false,
+  faq: false,
+} as const;
+
+export type UnavailablePageId = keyof typeof PAGE_AVAILABLE;
+
+export function isPageAvailable(id: UnavailablePageId): boolean {
+  return PAGE_AVAILABLE[id];
+}
