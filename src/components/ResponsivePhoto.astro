@@ -1,0 +1,84 @@
+---
+import {
+  photoResponsive,
+  type PhotoPreset,
+} from '../utils/photos';
+
+interface Props {
+  filename: string;
+  alt: string;
+  preset: PhotoPreset;
+  orientation?: 'landscape' | 'portrait' | 'square';
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  decoding?: 'async' | 'sync' | 'auto';
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+const {
+  filename,
+  alt,
+  preset,
+  orientation,
+  loading,
+  fetchpriority,
+  decoding = 'async',
+  width,
+  height,
+  class: className,
+} = Astro.props;
+
+const { src, srcSet, sizes } = photoResponsive(filename, preset, orientation);
+
+const presetClass =
+  preset === 'thumb'
+    ? 'responsive-photo--thumb'
+    : preset === 'hero'
+      ? 'responsive-photo--hero'
+      : preset === 'gallery' && orientation === 'landscape'
+        ? 'responsive-photo--gallery-landscape'
+        : undefined;
+---
+
+<img
+  src={src}
+  srcset={srcSet}
+  sizes={sizes}
+  alt={alt}
+  loading={loading}
+  fetchpriority={fetchpriority}
+  decoding={decoding}
+  width={width}
+  height={height}
+  class:list={[presetClass, className]}
+/>
+
+<style>
+  /* Guarantee cover-crop in portrait frames (panels, polaroids) */
+  .responsive-photo--thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* Hero fills its column and crops landscape shots vertically */
+  .responsive-photo--hero {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right 35%;
+  }
+
+  /* About-gallery landscape cells: fill width, crop top/bottom */
+  .responsive-photo--gallery-landscape {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center center;
+  }
+</style>

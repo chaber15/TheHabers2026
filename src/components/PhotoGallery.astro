@@ -1,7 +1,6 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-import type { PhotoEntry } from '../utils/photos';
+import ResponsivePhoto from './ResponsivePhoto.astro';
+import { sourceImageDimensions, type PhotoEntry } from '../utils/photos';
 
 interface Props {
   photos: PhotoEntry[];
@@ -11,44 +10,15 @@ interface Props {
 
 const { photos, variant = 'default' } = Astro.props;
 
-const PHOTOS_PUBLIC = path.join(process.cwd(), 'public', 'photos');
+type GalleryPhoto = PhotoEntry & {
+  orientation: 'landscape' | 'portrait' | 'square';
+  width?: number;
+  height?: number;
+};
 
-type GalleryPhoto = PhotoEntry & { orientation: 'landscape' | 'portrait' | 'square' };
-
-/** Read width/height at build time so landscape shots can span wider grid cells */
-function imageDimensions(filePath: string): { width: number; height: number } | null {
-  if (!fs.existsSync(filePath)) return null;
-
-  const buf = fs.readFileSync(filePath);
-  if (buf.length < 24) return null;
-
-  // JPEG
-  if (buf[0] === 0xff && buf[1] === 0xd8) {
-    let offset = 2;
-    while (offset < buf.length - 8) {
-      if (buf[offset] !== 0xff) break;
-      const marker = buf[offset + 1];
-      const length = buf.readUInt16BE(offset + 2);
-      if (marker === 0xc0 || marker === 0xc1 || marker === 0xc2) {
-        return {
-          width: buf.readUInt16BE(offset + 7),
-          height: buf.readUInt16BE(offset + 5),
-        };
-      }
-      offset += 2 + length;
-    }
-  }
-
-  // PNG
-  if (buf.toString('ascii', 0, 8) === '\x89PNG\r\n\x1a\n') {
-    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
-  }
-
-  return null;
-}
-
-function orientationFor(photo: PhotoEntry): GalleryPhoto['orientation'] {
-  const dims = imageDimensions(path.join(PHOTOS_PUBLIC, photo.filename));
+function orientationFor(
+  dims: { width: number; height: number } | null
+): GalleryPhoto['orientation'] {
   if (!dims) return 'portrait';
   const ratio = dims.width / dims.height;
   if (ratio > 1.15) return 'landscape';
@@ -56,9 +26,19 @@ function orientationFor(photo: PhotoEntry): GalleryPhoto['orientation'] {
   return 'square';
 }
 
+function enrichGalleryPhoto(photo: PhotoEntry): GalleryPhoto {
+  const dims = sourceImageDimensions(photo.filename);
+  return {
+    ...photo,
+    orientation: orientationFor(dims),
+    width: dims?.width,
+    height: dims?.height,
+  };
+}
+
 const galleryPhotos: GalleryPhoto[] =
   variant === 'about'
-    ? photos.map((photo) => ({ ...photo, orientation: orientationFor(photo) }))
+    ? photos.map(enrichGalleryPhoto)
     : photos.map((photo) => ({ ...photo, orientation: 'portrait' as const }));
 ---
 
@@ -76,7 +56,15 @@ const galleryPhotos: GalleryPhoto[] =
           variant === 'about' && `gallery-item--${photo.orientation}`,
         ]}
       >
-        <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
+        <ResponsivePhoto
+          filename={photo.filename}
+          alt={photo.alt}
+          preset="gallery"
+          orientation={variant === 'about' ? photo.orientation : undefined}
+          loading="lazy"
+          width={photo.width}
+          height={photo.height}
+        />
       </figure>
     ))
   }
@@ -146,6 +134,12 @@ const galleryPhotos: GalleryPhoto[] =
     object-fit: contain;
     object-position: center center;
     vertical-align: middle;
+  }
+
+  /* Landscape shots fill their grid span and crop vertically */
+  .photo-gallery--about .gallery-item--landscape img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
 
   @media (hover: hover) {

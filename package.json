@@ -8,6 +8,7 @@
   "scripts": {
     "sync-photos": "node scripts/sync-photos.js",
     "predev": "npm run sync-photos",
+    "predev:netlify": "npm run sync-photos",
     "prebuild": "npm run sync-photos",
     "dev": "astro dev",
     "dev:netlify": "netlify dev",
@@ -20,7 +21,8 @@
     "@astrojs/netlify": "^7.0.11",
     "@netlify/blobs": "^10.7.9",
     "astro": "^6.4.2",
-    "exifr": "^7.1.3"
+    "exifr": "^7.1.3",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@netlify/functions": "^4.2.3",

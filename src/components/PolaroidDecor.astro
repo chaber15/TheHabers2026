@@ -1,4 +1,5 @@
 ---
+import ResponsivePhoto from './ResponsivePhoto.astro';
 import {
   getPhotoManifest,
   getLandingPhoto,
@@ -74,9 +75,10 @@ function slotTop(index: number, count: number, seed: string): number {
     top = inset + (span / (count - 1)) * index;
   }
 
-  if (index === 0) {
-    top = Math.max(6, top - TOP_SLOT_LIFT);
-    if (seed.includes('registry')) top = Math.max(6, top - REGISTRY_TOP_EXTRA);
+  // Only Registry lifts the top slot — a global lift made the first gap
+  // wider than the rest on Schedule, Wedding Party, etc.
+  if (index === 0 && seed.includes('registry')) {
+    top = Math.max(6, top - TOP_SLOT_LIFT - REGISTRY_TOP_EXTRA);
   }
   return top;
 }
@@ -115,12 +117,13 @@ function cropClass(filename: string): string | undefined {
               class="polaroid-decor__frame"
               style={frameStyle(index, leftPhotos.length, 'left')}
             >
-              <img
-                src={photo.src}
+              <ResponsivePhoto
+                filename={photo.filename}
                 alt=""
+                preset="thumb"
                 loading="lazy"
-                width="240"
-                height="300"
+                width={240}
+                height={300}
                 class:list={[cropClass(photo.filename)]}
               />
             </figure>
@@ -134,12 +137,13 @@ function cropClass(filename: string): string | undefined {
               class="polaroid-decor__frame"
               style={frameStyle(index, rightPhotos.length, 'right')}
             >
-              <img
-                src={photo.src}
+              <ResponsivePhoto
+                filename={photo.filename}
                 alt=""
+                preset="thumb"
                 loading="lazy"
-                width="240"
-                height="300"
+                width={240}
+                height={300}
                 class:list={[cropClass(photo.filename)]}
               />
             </figure>

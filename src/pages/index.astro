@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ResponsivePhoto from '../components/ResponsivePhoto.astro';
 import WeddingCountdown from '../components/WeddingCountdown.astro';
 import site from '../../data/site.json';
 import {
@@ -40,11 +41,12 @@ const [heroName1, heroName2] = site.couple.displayName.split(/\s*&\s*/);
       {
         landingPhoto && (
           <div class="hero-media">
-            <img
-              src={landingPhoto.src}
+            <ResponsivePhoto
+              filename={landingPhoto.filename}
               alt={landingPhoto.alt}
-              width="1600"
-              height="1000"
+              preset="hero"
+              width={1600}
+              height={1000}
               fetchpriority="high"
             />
           </div>
@@ -59,12 +61,13 @@ const [heroName1, heroName2] = site.couple.displayName.split(/\s*&\s*/);
                 {
                   panelPhotosTop.map((photo, index) => (
                     <figure class:list={['panel-photo', `panel-photo--${index + 1}`]}>
-                      <img
-                        src={photo.src}
+                      <ResponsivePhoto
+                        filename={photo.filename}
                         alt=""
+                        preset="thumb"
                         loading="lazy"
-                        width="280"
-                        height="350"
+                        width={280}
+                        height={350}
                         class:list={[panelCropClass(photo.filename)]}
                       />
                     </figure>
@@ -108,12 +111,13 @@ const [heroName1, heroName2] = site.couple.displayName.split(/\s*&\s*/);
                 {
                   panelPhotosBottom.map((photo, index) => (
                     <figure class:list={['panel-photo', `panel-photo--${index + 4}`]}>
-                      <img
-                        src={photo.src}
+                      <ResponsivePhoto
+                        filename={photo.filename}
                         alt=""
+                        preset="thumb"
                         loading="lazy"
-                        width="280"
-                        height="350"
+                        width={280}
+                        height={350}
                         class:list={[panelCropClass(photo.filename)]}
                       />
                     </figure>
@@ -454,6 +458,7 @@ const [heroName1, heroName2] = site.couple.displayName.split(/\s*&\s*/);
       width: 100%;
       height: auto;
       max-height: min(17vh, 168px);
+      object-fit: cover;
     }
 
     .panel-invite {

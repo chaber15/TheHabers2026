@@ -10,6 +10,188 @@ export interface PhotoEntry {
   alt: string;
 }
 
+export type PhotoPreset = 'thumb' | 'gallery' | 'hero';
+export type PhotoVariantWidth = 400 | 800 | 1600;
+
+export const PHOTO_VARIANT_WIDTHS: PhotoVariantWidth[] = [400, 800, 1600];
+
+const PHOTOS_PUBLIC = path.join(process.cwd(), 'public', 'photos');
+
+/** Variant files that exist on disk after sync (build time) */
+export function availableVariantWidths(filename: string): PhotoVariantWidth[] {
+  const stem = filename.replace(/\.[^.]+$/, '');
+  return PHOTO_VARIANT_WIDTHS.filter((width) =>
+    fs.existsSync(path.join(PHOTOS_PUBLIC, `${stem}.w${width}.webp`))
+  );
+}
+
+/** Pick desired tiers that were generated, else fall back to largest available */
+function resolveVariantWidths(
+  filename: string,
+  desired: PhotoVariantWidth[]
+): PhotoVariantWidth[] {
+  const available = availableVariantWidths(filename);
+  const picked = desired.filter((width) => available.includes(width));
+  if (picked.length > 0) return picked;
+  return available.length > 0 ? available : [400];
+}
+
+/** Build URL for a resized WebP variant (encode spaces for valid srcset) */
+export function photoVariantSrc(filename: string, width: PhotoVariantWidth): string {
+  const stem = filename.replace(/\.[^.]+$/, '');
+  return `/photos/${encodeURIComponent(`${stem}.w${width}.webp`)}`;
+}
+
+/** Read pixel width from an original source file */
+export function sourceImageDimensions(
+  filename: string
+): { width: number; height: number } | null {
+  const source = findSourcePhotoPath(filename);
+  if (!source) return null;
+
+  const buf = fs.readFileSync(source);
+  if (buf.length < 24) return null;
+
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    let offset = 2;
+    while (offset < buf.length - 8) {
+      if (buf[offset] !== 0xff) break;
+      const marker = buf[offset + 1];
+      const length = buf.readUInt16BE(offset + 2);
+      if (marker === 0xc0 || marker === 0xc1 || marker === 0xc2) {
+        return {
+          width: buf.readUInt16BE(offset + 7),
+          height: buf.readUInt16BE(offset + 5),
+        };
+      }
+      offset += 2 + length;
+    }
+  }
+
+  if (buf.toString('ascii', 0, 8) === '\x89PNG\r\n\x1a\n') {
+    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  }
+
+  return null;
+}
+
+/** Find original photo path under photos/ */
+export function findSourcePhotoPath(filename: string): string | null {
+  function search(dir: string): string | null {
+    if (!fs.existsSync(dir)) return null;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const found = search(full);
+        if (found) return found;
+      } else if (entry.name === filename) {
+        return full;
+      }
+    }
+    return null;
+  }
+  return search(PHOTOS_DIR);
+}
+
+/** Largest generated variant tier for a photo */
+export function defaultPhotoSrc(filename: string): string {
+  const widths = resolveVariantWidths(filename, [400, 800, 1600]);
+  const srcWidth = Math.max(...widths) as PhotoVariantWidth;
+  return photoVariantSrc(filename, srcWidth);
+}
+
+/** Comma-separated srcset using actual pixel widths (never claims wider than the file) */
+export function photoSrcSet(filename: string, tiers: PhotoVariantWidth[]): string {
+  const sourceW = sourceImageDimensions(filename)?.width;
+  return tiers
+    .map((tier) => {
+      const pixels = sourceW ? Math.min(tier, sourceW) : tier;
+      return `${photoVariantSrc(filename, tier)} ${pixels}w`;
+    })
+    .join(', ');
+}
+
+/** sizes attribute tuned per display context */
+export function photoSizes(
+  preset: PhotoPreset,
+  orientation?: 'landscape' | 'portrait' | 'square'
+): string {
+  switch (preset) {
+    case 'thumb':
+      return '280px';
+    case 'hero':
+      return '(min-width: 1024px) 50vw, 100vw';
+    case 'gallery':
+      if (orientation === 'landscape') {
+        return '(min-width: 1024px) 66vw, (min-width: 640px) 100vw, 100vw';
+      }
+      return '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
+    default:
+      return '100vw';
+  }
+}
+
+/** Default src + srcset for a preset (largest tier as fallback src) */
+export function photoResponsive(
+  filename: string,
+  preset: PhotoPreset,
+  orientation?: 'landscape' | 'portrait' | 'square'
+): { src: string; srcSet: string; sizes: string } {
+  const sizes = photoSizes(preset, orientation);
+
+  switch (preset) {
+    case 'thumb': {
+      const widths = resolveVariantWidths(filename, [400]);
+      const srcWidth = Math.max(...widths) as PhotoVariantWidth;
+      return {
+        src: photoVariantSrc(filename, srcWidth),
+        srcSet: photoSrcSet(filename, widths),
+        sizes,
+      };
+    }
+    case 'hero': {
+      const widths = resolveVariantWidths(filename, [800, 1600]);
+      const srcWidth = Math.max(...widths) as PhotoVariantWidth;
+      return {
+        src: photoVariantSrc(filename, srcWidth),
+        srcSet: photoSrcSet(filename, widths),
+        sizes,
+      };
+    }
+    case 'gallery': {
+      const sourceW = sourceImageDimensions(filename)?.width;
+      // Only advertise tiers the source can fill — avoids 404s on .w800.webp
+      // for photos narrower than 800px (e.g. IMG_0266 at 600px).
+      let desired: PhotoVariantWidth[];
+      if (orientation === 'landscape') {
+        if (sourceW && sourceW >= 1600) desired = [800, 1600];
+        else if (sourceW && sourceW > 800) desired = [800];
+        else desired = [400];
+      } else if (sourceW && sourceW >= 800) {
+        desired = [800, 400];
+      } else {
+        desired = [400];
+      }
+      const widths = resolveVariantWidths(filename, desired);
+      const srcWidth = Math.min(...widths) as PhotoVariantWidth;
+      return {
+        src: photoVariantSrc(filename, srcWidth),
+        srcSet: photoSrcSet(filename, widths),
+        sizes,
+      };
+    }
+    default: {
+      const widths = resolveVariantWidths(filename, [400, 800]);
+      const srcWidth = Math.max(...widths) as PhotoVariantWidth;
+      return {
+        src: photoVariantSrc(filename, srcWidth),
+        srcSet: photoSrcSet(filename, widths),
+        sizes,
+      };
+    }
+  }
+}
+
 // Raster photos shown in galleries/hero. SVGs (placeholder art and icons)
 // are intentionally excluded so they don't appear in the photo gallery.
 const PHOTO_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
@@ -84,7 +266,7 @@ export function getPhotoManifest(): PhotoEntry[] {
 
     return {
       filename,
-      src: `/photos/${filename}`,
+      src: defaultPhotoSrc(filename),
       tags,
       alt: meta?.alt ?? `Caleb and Emma — photo ${index + 1}`,
     };
@@ -127,13 +309,13 @@ export function getAboutUsPhotos(photos: PhotoEntry[]): PhotoEntry[] {
   return photos.filter((photo) => photo.tags.includes('about'));
 }
 
-/** Resolve source file for an about-us photo (folder scan, then flat public copy) */
+/** Resolve original source file for an about-us photo */
 function aboutUsSourcePath(filename: string): string | null {
   const inAlbum = path.join(ABOUT_US_DIR, filename);
   if (fs.existsSync(inAlbum)) return inAlbum;
 
-  const inPublic = path.join(process.cwd(), 'public', 'photos', filename);
-  if (fs.existsSync(inPublic)) return inPublic;
+  const inPhotos = path.join(PHOTOS_DIR, filename);
+  if (fs.existsSync(inPhotos)) return inPhotos;
 
   return null;
 }
