@@ -1,36 +1,40 @@
 {
   "entries": [
     {
-      "question": "What time should I arrive?",
-      "answer": "Please plan to arrive by 3:30 PM. The ceremony will begin promptly at 4:00 PM."
+      "question": "Where is my RSVP access code?",
+      "answer": "Your access code should be printed on a separate slip of paper inside your invitation envelope. If you can't find yours (or are having trouble RSVPing), please email <a href=\"mailto:thehabers2026@gmail.com\">thehabers2026@gmail.com</a>."
     },
     {
-      "question": "What is the dress code?",
-      "answer": "Cocktail attire. We suggest comfortable shoes for dancing and an optional light layer for the evening."
+      "question": "How do I change my RSVP status?",
+      "answer": "Once you RSVP on the website, you cannot change your status. Please email <a href=\"mailto:thehabers2026@gmail.com\">thehabers2026@gmail.com</a> if your plans change."
     },
     {
-      "question": "Are children welcome?",
-      "answer": "We love your little ones, but we've chosen an adults-only celebration. We hope this gives you a chance to relax and enjoy the evening."
+      "question": "I'm from out of town. Do you have a hotel suggestion?",
+      "answer": "Yes, we have rooms reserved at the Courtyard by Marriott in Silver Spring North/White Oak. There are single king bed rooms available for $149 and double queen bed rooms for $169 which must be booked by September 4th. To reserve, either call <a href=\"tel:+13016808500\">301-680-8500</a> and mention the Vanden Berg/Haber Wedding or use the following <a href=\"https://tinyurl.com/Habers2026WeddingBlock\" target=\"_blank\" rel=\"noopener noreferrer\">reservation link</a>."
     },
     {
-      "question": "Is there parking at the venue?",
-      "answer": "Yes, free parking is available on-site at Good Hope Presbyterian Church. Additional details will be shared closer to the date."
+      "question": "What is the wedding dress code?",
+      "answer": "The dress code is semi-formal/cocktail. Please note that while the ceremony will be held inside, our reception will be held in a covered outdoor pavilion, so pay attention to the weather!"
     },
     {
-      "question": "Can I bring a plus-one?",
-      "answer": "Your invitation will indicate the number of guests in your party. Please RSVP for the exact number listed on your invitation."
+      "question": "Is there parking available at the wedding/reception venue?",
+      "answer": "There is plenty of free parking at both the church and the reception venue. However, you should arrive 20–30 minutes prior to the ceremony to ensure that you find parking and seating in plenty of time."
     },
     {
-      "question": "How do I RSVP?",
-      "answer": "Use the RSVP page and enter the unique access code printed on your invitation. If you have trouble, reach out to us directly."
+      "question": "Can I take pictures during the ceremony?",
+      "answer": "No. Unfortunately taking your own photos blocks other guests' views and distracts the wedding party. We will have a professional photographer at the ceremony."
     },
     {
-      "question": "Where should I stay?",
-      "answer": "Hotel block information will be added here once finalized. Check back soon for recommended accommodations."
+      "question": "Who took all of these amazing photos?",
+      "answer": "The home page images and \u201Cpolaroid\u201D style pictures were taken by Caleb's <a href=\"https://thestoriedrecipe.com\" target=\"_blank\" rel=\"noopener noreferrer\">Aunt Becky</a> during their engagement. The photos on our \u201CAbout Us\u201D page are a combination of photos taken by Caleb's Mom, his sister Grace, and selfies taken by us :)"
     },
     {
-      "question": "Are gifts expected?",
-      "answer": "Your presence is truly the best gift. If you'd like to give something, we've listed a registry on the Registry page."
+      "question": "These invitations are beautiful! Where did you get them?",
+      "answer": "Emma designed the text and layout, then her incredibly talented grandma Willow Vanden Berg hand-painted the flowers and Bible verse for us to print!"
+    },
+    {
+      "question": "Wow, this website is so cool! Who designed it? (Oh no! Something on this website is broken…)",
+      "answer": "Caleb recently earned a degree in computer science and decided to program this wedding website in his free time! If you think something is broken or if you are having trouble RSVPing, please reach out to him at <a href=\"mailto:thehabers2026@gmail.com\">thehabers2026@gmail.com</a>."
     }
   ]
 }

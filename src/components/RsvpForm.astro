@@ -13,7 +13,7 @@
 <!-- is:global — guest rows are injected via JS, so Astro scoped CSS would not apply -->
 <style is:global>
   #rsvp-form-root.rsvp-container {
-    max-width: 560px;
+    max-width: 460px;
     margin: 0 auto;
     padding: var(--space-xl) var(--space-lg);
     background: var(--color-white);
@@ -25,6 +25,89 @@
   #rsvp-form-root .rsvp-greeting {
     color: var(--color-warm-gray);
     margin-bottom: var(--space-md);
+  }
+
+  #rsvp-form-root .rsvp-code-step {
+    text-align: center;
+  }
+
+  #rsvp-form-root .rsvp-code-step__title {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.6rem, 4vw, 2rem);
+    color: var(--color-charcoal);
+    margin: 0 0 var(--space-sm);
+    letter-spacing: 0.01em;
+  }
+
+  #rsvp-form-root .rsvp-code-step__rule {
+    width: 48px;
+    height: 1px;
+    background: var(--color-dusty-rose);
+    margin: 0 auto var(--space-md);
+    opacity: 0.85;
+  }
+
+  #rsvp-form-root .rsvp-code-step .rsvp-intro {
+    margin: 0 auto var(--space-lg);
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 480px) {
+    #rsvp-form-root .rsvp-code-step .rsvp-intro {
+      white-space: normal;
+      font-size: 0.9rem;
+    }
+  }
+
+  #rsvp-form-root .rsvp-code-step__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-md);
+  }
+
+  #rsvp-form-root .rsvp-code-step__actions .form-error {
+    text-align: center;
+  }
+
+  /* Soften the heavy halo on the Continue button in this card */
+  #rsvp-form-root .rsvp-code-step__actions .btn-primary {
+    box-shadow: 0 1px 4px rgba(42, 40, 38, 0.08);
+  }
+
+  #rsvp-form-root .rsvp-code-step__field {
+    max-width: 14rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  #rsvp-form-root .rsvp-code-step__field label {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-warm-gray);
+    margin-bottom: var(--space-sm);
+  }
+
+  #rsvp-form-root .rsvp-code-step__field .form-input {
+    padding: 0.65rem var(--space-sm);
+    font-size: 1rem;
+    text-align: center;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-family: var(--font-detail);
+  }
+
+  #rsvp-form-root .rsvp-code-step__field .form-input::placeholder {
+    letter-spacing: 0.08em;
+    text-transform: none;
+    color: color-mix(in srgb, var(--color-warm-gray) 60%, transparent);
   }
 
   #rsvp-form-root .rsvp-greeting {

@@ -203,6 +203,8 @@ interface ManifestFile {
     filename: string;
     tags?: string[];
     alt?: string;
+    /** ISO date override when EXIF / file dates are wrong (about-us sort) */
+    takenAt?: string;
   }>;
 }
 
@@ -320,8 +322,23 @@ function aboutUsSourcePath(filename: string): string | null {
   return null;
 }
 
+/** Manifest date override for photos with unreliable EXIF */
+function manifestTakenAt(filename: string): number | null {
+  if (!fs.existsSync(MANIFEST_PATH)) return null;
+
+  const manifestData = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8')) as ManifestFile;
+  const takenAt = manifestData.photos?.find((entry) => entry.filename === filename)?.takenAt;
+  if (!takenAt) return null;
+
+  const ms = new Date(takenAt).getTime();
+  return Number.isNaN(ms) ? null : ms;
+}
+
 /** Best available capture date from EXIF, else file modified time */
 async function photoTakenTime(filename: string): Promise<number> {
+  const override = manifestTakenAt(filename);
+  if (override !== null) return override;
+
   const filePath = aboutUsSourcePath(filename);
   if (!filePath) return 0;
 

@@ -31,18 +31,32 @@ import weddingParty from '../../data/wedding-party.json';
               <div class="party-roster__cell party-roster__cell--bride">
                 <p class="party-roster__name">{row.brideSide.name}</p>
                 <p class="party-roster__title">{row.brideSide.title}</p>
+                {row.brideSide.relationship && (
+                  <p class="party-roster__relationship">{row.brideSide.relationship}</p>
+                )}
               </div>
               <div class="party-roster__cell party-roster__cell--groom">
                 <p class="party-roster__name">{row.groomSide.name}</p>
                 <p class="party-roster__title">{row.groomSide.title}</p>
+                {row.groomSide.relationship && (
+                  <p class="party-roster__relationship">{row.groomSide.relationship}</p>
+                )}
               </div>
             </div>
           ))
         }
       </div>
 
+      <div class="party-roster__officiant">
+        <h2 class="party-roster__section-heading">Officiant</h2>
+        <div class="party-roster__officiant-card">
+          <p class="party-roster__name">{weddingParty.officiant.name}</p>
+          <p class="party-roster__title">{weddingParty.officiant.title}</p>
+        </div>
+      </div>
+
       <div class="party-roster__parents">
-        <h2 class="party-roster__parents-heading">Parents</h2>
+        <h2 class="party-roster__section-heading">Parents</h2>
         <div class="party-roster__columns">
           {
             weddingParty.parents.map((row) => (
@@ -114,16 +128,29 @@ import weddingParty from '../../data/wedding-party.json';
     letter-spacing: 0.02em;
   }
 
+  .party-roster__relationship {
+    margin: 0.35em 0 0;
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--color-warm-gray);
+  }
+
+  .party-roster__officiant,
   .party-roster__parents {
     margin-top: var(--space-xl);
     padding-top: var(--space-lg);
     border-top: 1px solid var(--color-border);
   }
 
-  .party-roster__parents-heading {
+  .party-roster__section-heading {
     text-align: center;
     font-size: clamp(1.25rem, 3vw, 1.5rem);
     margin: 0 0 var(--space-lg);
+  }
+
+  .party-roster__officiant-card {
+    text-align: center;
+    padding: var(--space-sm) var(--space-xs);
   }
 
   @media (min-width: 640px) {

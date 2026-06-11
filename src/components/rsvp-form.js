@@ -8,14 +8,18 @@ export function initRsvpForm(root) {
   let party = null;
 
   root.innerHTML = `
-    <div class="rsvp-step" data-step="code">
-      <p class="rsvp-intro">Enter the access code printed on your invitation to RSVP.</p>
-      <div class="form-group">
+    <div class="rsvp-step rsvp-code-step" data-step="code">
+      <h2 class="rsvp-code-step__title">Please RSVP</h2>
+      <div class="rsvp-code-step__rule" aria-hidden="true"></div>
+      <p class="rsvp-intro">Enter the access code included in your invitation to RSVP.</p>
+      <div class="form-group rsvp-code-step__field">
         <label for="access-code">Access Code</label>
         <input id="access-code" class="form-input" type="text" autocomplete="off" placeholder="e.g. HBRFAM" maxlength="12" />
       </div>
-      <button type="button" class="btn btn-primary" id="validate-btn">Continue</button>
-      <p class="form-error" id="code-error" hidden></p>
+      <div class="rsvp-code-step__actions">
+        <button type="button" class="btn btn-primary" id="validate-btn">Continue</button>
+        <p class="form-error" id="code-error" hidden></p>
+      </div>
     </div>
 
     <div class="rsvp-step" data-step="form" hidden>
@@ -122,37 +126,6 @@ export function initRsvpForm(root) {
     });
   }
 
-  /** Join name parts with natural "and" (e.g. Kate, Joseph and a guest) */
-  function joinNameList(parts) {
-    if (parts.length === 0) return '';
-    if (parts.length === 1) return parts[0];
-    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
-    return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
-  }
-
-  /** Thank-you copy uses real names only; plus-ones count as "a guest" */
-  function formatAttendingForThankYou(responses, members) {
-    const byId = new Map(members.map((m) => [m.id, m]));
-    const realNames = [];
-    let plusOnesAttending = 0;
-
-    for (const response of responses) {
-      if (!response.attending) continue;
-      const member = byId.get(response.guestId);
-      if (member?.isPlusOne) {
-        plusOnesAttending += 1;
-      } else {
-        realNames.push(member?.name ?? response.name);
-      }
-    }
-
-    const parts = [...realNames];
-    if (plusOnesAttending === 1) parts.push('a guest');
-    else if (plusOnesAttending > 1) parts.push(`${plusOnesAttending} guests`);
-
-    return joinNameList(parts);
-  }
-
   /** Name shown in already-submitted list (no "Plus One" label) */
   function nameForSummary(member, members) {
     if (!member?.isPlusOne) return member?.name ?? '';
@@ -254,16 +227,12 @@ export function initRsvpForm(root) {
         return;
       }
 
-      const attendingLabel = formatAttendingForThankYou(guestResponses, party.members);
-      const everyoneComing = guestResponses.every((g) => g.attending);
       const noOneComing = guestResponses.every((g) => !g.attending);
 
       if (noOneComing) {
         confirmationText.textContent = `Thank you for letting us know. We'll miss you at the celebration.`;
-      } else if (everyoneComing) {
-        confirmationText.textContent = `We're so glad ${attendingLabel} will be joining us! We can't wait to celebrate together.`;
       } else {
-        confirmationText.textContent = `Thank you! We're excited to celebrate with ${attendingLabel}.`;
+        confirmationText.textContent = `We're so glad you will be joining us! We can't wait to celebrate together.`;
       }
       showStep('done');
     } catch {

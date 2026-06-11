@@ -2,7 +2,7 @@
 export const PAGE_AVAILABLE = {
   schedule: true,
   gallery: true,
-  faq: false,
+  faq: true,
 } as const;
 
 export type UnavailablePageId = keyof typeof PAGE_AVAILABLE;

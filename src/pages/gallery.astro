@@ -1,12 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ComingSoon from '../components/ComingSoon.astro';
+import ResponsivePhoto from '../components/ResponsivePhoto.astro';
 import { isPageAvailable } from '../config/page-availability';
 import story from '../../data/story.json';
 import PhotoGallery from '../components/PhotoGallery.astro';
 import { getPhotoManifest, getAboutUsPhotosChronological } from '../utils/photos';
 
-const aboutPhotos = await getAboutUsPhotosChronological(getPhotoManifest());
+const FIRST_DATE_PHOTO = 'our-first-date.jpg';
+
+const photos = getPhotoManifest();
+const firstDatePhoto = photos.find((photo) => photo.filename === FIRST_DATE_PHOTO);
+const aboutPhotos = await getAboutUsPhotosChronological(photos);
 ---
 
 {
@@ -25,7 +30,27 @@ const aboutPhotos = await getAboutUsPhotosChronological(getPhotoManifest());
       <section class="story-gallery">
         <div class="container story-gallery__intro">
           <h1>About Us</h1>
-          <p class="story-gallery__text">{story.intro}</p>
+          <div class="story-gallery__lead">
+            {
+              firstDatePhoto && (
+                <figure class="story-polaroid">
+                  <div class="story-polaroid__frame">
+                    <ResponsivePhoto
+                      filename={firstDatePhoto.filename}
+                      alt={firstDatePhoto.alt}
+                      preset="thumb"
+                      loading="eager"
+                      width={280}
+                      height={350}
+                      class="story-polaroid__img"
+                    />
+                  </div>
+                  <figcaption class="story-polaroid__caption">Our first &ldquo;date&rdquo;</figcaption>
+                </figure>
+              )
+            }
+            <p class="story-gallery__text">{story.intro}</p>
+          </div>
         </div>
 
         <div class="container">
@@ -49,13 +74,52 @@ const aboutPhotos = await getAboutUsPhotosChronological(getPhotoManifest());
   }
 
   .story-gallery__intro {
-    max-width: var(--prose-width);
+    max-width: 56rem;
     margin: 0 auto var(--space-xl);
-    text-align: center;
   }
 
   .story-gallery__intro h1 {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+
+  .story-gallery__lead {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .story-polaroid {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 10px 10px 28px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 2px;
+    box-shadow: 0 6px 20px rgba(42, 40, 38, 0.12);
+    transform: rotate(-2deg);
+    max-width: 16rem;
+  }
+
+  .story-polaroid__frame {
+    overflow: hidden;
+  }
+
+  /* :global reaches the img rendered inside ResponsivePhoto */
+  .story-polaroid__frame :global(.story-polaroid__img) {
+    aspect-ratio: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .story-polaroid__caption {
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-detail);
+    font-size: 1.125rem;
+    font-style: italic;
+    text-align: center;
+    color: var(--color-charcoal);
   }
 
   .story-gallery__text {
@@ -64,6 +128,24 @@ const aboutPhotos = await getAboutUsPhotosChronological(getPhotoManifest());
     line-height: 1.75;
     color: var(--color-warm-gray);
     text-wrap: pretty;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .story-gallery__lead {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--space-xl);
+    }
+
+    .story-polaroid {
+      margin-top: var(--space-xs);
+    }
+
+    .story-gallery__text {
+      text-align: left;
+      flex: 1;
+    }
   }
 
   .story-gallery__empty {

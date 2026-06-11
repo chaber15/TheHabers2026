@@ -5,26 +5,30 @@
   },
   "party": [
     {
-      "brideSide": { "name": "Jenna Vanden Berg", "title": "Maid of Honor" },
-      "groomSide": { "name": "Marcus Hadeed", "title": "Best Man" }
+      "brideSide": { "name": "Jenna VandenBerg", "title": "Maid of Honor", "relationship": "Cousin of the Bride" },
+      "groomSide": { "name": "Marcus Hadeed", "title": "Best Man", "relationship": "Cousin of the Groom" }
     },
     {
-      "brideSide": { "name": "Hannah Haber", "title": "Bridesmaid" },
-      "groomSide": { "name": "Jack Hadeed", "title": "Best Man" }
+      "brideSide": { "name": "Hannah Haber", "title": "Bridesmaid", "relationship": "Sister of the Groom" },
+      "groomSide": { "name": "Jack Hadeed", "title": "Best Man", "relationship": "Cousin of the Groom" }
     },
     {
-      "brideSide": { "name": "Grace Haber", "title": "Bridesmaid" },
-      "groomSide": { "name": "Jonathan McIntosh", "title": "Groomsman" }
+      "brideSide": { "name": "Grace Haber", "title": "Bridesmaid", "relationship": "Sister of the Groom" },
+      "groomSide": { "name": "Jonathan McIntosh", "title": "Groomsman", "relationship": "Cousin of the Groom" }
     },
     {
-      "brideSide": { "name": "Michelle Ameyaw", "title": "Bridesmaid" },
-      "groomSide": { "name": "Tom Mygatt", "title": "Groomsman" }
+      "brideSide": { "name": "Michelle Ameyaw", "title": "Bridesmaid", "relationship": "Childhood friend of the Bride" },
+      "groomSide": { "name": "Tom Mygatt", "title": "Groomsman", "relationship": "Childhood friend of the Groom" }
     },
     {
-      "brideSide": { "name": "Lizzie Walker", "title": "Bridesmaid" },
-      "groomSide": { "name": "Darrel Bossman", "title": "Groomsman" }
+      "brideSide": { "name": "Lizzie Walker", "title": "Bridesmaid", "relationship": "College friend of the Bride" },
+      "groomSide": { "name": "Darrel Bossman", "title": "Groomsman", "relationship": "Childhood friend of the Groom" }
     }
   ],
+  "officiant": {
+    "name": "Sam Hettinger",
+    "title": "Pastor of Mt. Airy Presbyterian Church"
+  },
   "parents": [
     {
       "brideSide": { "name": "Amy Vanden Berg", "title": "Mother of the Bride" },

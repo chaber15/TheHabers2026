@@ -486,6 +486,7 @@ p:last-child {
   color: var(--color-warm-gray);
   font-size: 0.95rem;
   line-height: 1.7;
+  text-align: center;
 }
 
 .schedule-notes li {
@@ -548,6 +549,19 @@ p:last-child {
   color: var(--color-warm-gray);
   font-size: 0.98rem;
   line-height: 1.65;
+}
+
+.faq-item p a {
+  color: var(--color-sage-dark);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-sage) 50%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.faq-item p a:hover {
+  color: var(--color-sage);
+  text-decoration-color: var(--color-sage);
 }
 
 /* Story blocks */
