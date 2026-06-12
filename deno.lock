@@ -15,7 +15,9 @@
         "npm:@netlify/blobs@^10.7.9",
         "npm:@netlify/functions@^4.2.3",
         "npm:astro@^6.4.2",
-        "npm:netlify-cli@23"
+        "npm:exifr@^7.1.3",
+        "npm:netlify-cli@23",
+        "npm:sharp@~0.34.5"
       ]
     }
   }

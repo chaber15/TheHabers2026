@@ -15,7 +15,11 @@ interface RsvpBody {
   guestResponses?: GuestResponse[];
   dietaryNotes?: string;
   message?: string;
+  email?: string;
 }
+
+/** Lightweight email format check (server-side guard, never strict) */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Validate submitted guest responses match the party roster */
 function validateGuestResponses(
@@ -63,7 +67,16 @@ export const handler: Handler = async (event) => {
   try {
     bindBlobsContext(event);
     const body = JSON.parse(event.body ?? '{}') as RsvpBody;
-    const { partyId, accessCode, guestResponses, dietaryNotes, message } = body;
+    const { partyId, accessCode, guestResponses, dietaryNotes, message, email } = body;
+
+    const normalizedEmail = (email ?? '').trim();
+    if (normalizedEmail && !EMAIL_RE.test(normalizedEmail)) {
+      return {
+        statusCode: 400,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ error: 'That email address doesn\u2019t look valid.' }),
+      };
+    }
 
     if (!partyId || !accessCode) {
       return {
@@ -121,6 +134,7 @@ export const handler: Handler = async (event) => {
       attendeeCount,
       dietaryNotes: (dietaryNotes ?? '').trim(),
       message: (message ?? '').trim(),
+      email: normalizedEmail,
       submittedAt: new Date().toISOString(),
     };
 

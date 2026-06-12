@@ -19,6 +19,8 @@ export interface StoredRsvp {
   attendeeCount: number;
   dietaryNotes: string;
   message: string;
+  /** Optional contact email — empty string if not provided */
+  email: string;
   submittedAt: string;
 }
 

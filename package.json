@@ -15,7 +15,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "guests": "node scripts/manage-guests.js"
+    "guests": "node scripts/manage-guests.js",
+    "import-guests": "node scripts/import-guests.js"
   },
   "dependencies": {
     "@astrojs/netlify": "^7.0.11",

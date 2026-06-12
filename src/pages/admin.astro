@@ -42,6 +42,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 <th>Count</th>
                 <th>Guests</th>
                 <th>Dietary</th>
+                <th>Email</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -100,6 +101,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <td>${party.attendeeCount ?? '—'}</td>
           <td class="guest-responses-cell">${party.guestResponses || '—'}</td>
           <td>${party.dietaryNotes || '—'}</td>
+          <td>${party.email ? `<a href="mailto:${party.email}">${party.email}</a>` : '—'}</td>
         </tr>
       `
       )

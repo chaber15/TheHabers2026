@@ -27,6 +27,13 @@
     margin-bottom: var(--space-md);
   }
 
+  #rsvp-form-root .form-hint {
+    margin: var(--space-xs) 0 0;
+    font-size: 0.8rem;
+    color: var(--color-warm-gray);
+    font-style: italic;
+  }
+
   #rsvp-form-root .rsvp-code-step {
     text-align: center;
   }
@@ -102,6 +109,10 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-family: var(--font-detail);
+    /* Cormorant uses old-style figures by default — switch to lining figures
+       so numerals match uppercase cap-height inside access codes like P2QZAI */
+    font-variant-numeric: lining-nums;
+    font-feature-settings: 'lnum' 1, 'onum' 0;
   }
 
   #rsvp-form-root .rsvp-code-step__field .form-input::placeholder {

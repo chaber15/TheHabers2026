@@ -12,7 +12,7 @@ const CORS_HEADERS = {
 /** Build CSV export from guest list merged with blob RSVPs */
 function buildCsv(rows: Array<Record<string, string | number | boolean | null>>): string {
   if (rows.length === 0) {
-    return 'partyId,partyName,partySize,accessCode,rsvpStatus,attending,attendeeCount,guestResponses,dietaryNotes,message,submittedAt\n';
+    return 'partyId,partyName,partySize,accessCode,rsvpStatus,attending,attendeeCount,guestResponses,dietaryNotes,message,email,submittedAt\n';
   }
 
   const headers = Object.keys(rows[0]);
@@ -105,6 +105,7 @@ export const handler: Handler = async (event) => {
         guestResponses: formatGuestResponses(rsvp?.guestResponses),
         dietaryNotes: rsvp?.dietaryNotes ?? party.dietaryNotes,
         message: rsvp?.message ?? party.message,
+        email: rsvp?.email ?? '',
         submittedAt: rsvp?.submittedAt ?? party.rsvpSubmittedAt,
       };
     });

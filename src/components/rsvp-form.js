@@ -33,6 +33,11 @@ export function initRsvpForm(root) {
           <label for="dietary-notes">Dietary restrictions (optional)</label>
           <input id="dietary-notes" class="form-input" type="text" placeholder="Vegetarian, gluten-free, etc." />
         </div>
+        <div class="form-group">
+          <label for="contact-email">Email (optional)</label>
+          <input id="contact-email" class="form-input" type="email" autocomplete="email" placeholder="you@example.com" />
+          <p class="form-hint">So we can reach you with any wedding-day updates.</p>
+        </div>
         <button type="submit" class="btn btn-primary">Submit RSVP</button>
         <p class="form-error" id="form-error" hidden></p>
       </form>
@@ -207,6 +212,15 @@ export function initRsvpForm(root) {
       return;
     }
 
+    const emailInput = root.querySelector('#contact-email');
+    const email = emailInput.value.trim();
+    if (email && !emailInput.checkValidity()) {
+      formError.textContent = 'That email address doesn\u2019t look quite right.';
+      formError.hidden = false;
+      emailInput.focus();
+      return;
+    }
+
     try {
       const response = await fetch(apiUrl(API_RSVP), {
         method: 'POST',
@@ -216,6 +230,7 @@ export function initRsvpForm(root) {
           accessCode: codeInput.value.trim(),
           guestResponses,
           dietaryNotes: root.querySelector('#dietary-notes').value,
+          email,
         }),
       });
 

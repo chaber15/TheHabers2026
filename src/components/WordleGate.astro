@@ -15,12 +15,29 @@
     position: fixed;
     inset: 0;
     z-index: 9999;
+    /* Scrollable when content exceeds the viewport (short laptops, phones in
+       landscape, foldables in split view, etc.) */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex;
-    align-items: center;
+    /* Anchor content to the top so the title is always visible; if the panel
+       is taller than the viewport the keyboard/buttons can be scrolled to. */
+    align-items: flex-start;
     justify-content: center;
     background: var(--color-ivory);
-    padding: var(--space-md);
+    /* Safe-area padding for notched devices + breathing room top/bottom */
+    padding: max(var(--space-lg), env(safe-area-inset-top))
+             max(var(--space-md), env(safe-area-inset-right))
+             max(var(--space-lg), env(safe-area-inset-bottom))
+             max(var(--space-md), env(safe-area-inset-left));
     transition: opacity 400ms ease;
+  }
+
+  /* When the viewport is tall enough, center the panel vertically */
+  @media (min-height: 820px) {
+    .wordle-overlay {
+      align-items: center;
+    }
   }
 
   .wordle-overlay--hide {
@@ -32,18 +49,21 @@
     width: 100%;
     max-width: 480px;
     text-align: center;
+    /* Keep the panel from squeezing itself when overflow scroll is engaged */
+    margin: auto;
   }
 
   .wordle-title {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 5vw, 2rem);
     margin-bottom: var(--space-sm);
   }
 
   .wordle-subtitle {
     color: var(--color-warm-gray);
     margin-bottom: var(--space-lg);
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+    line-height: 1.5;
   }
 
   .wordle-board {
@@ -172,6 +192,57 @@
       min-width: 26px;
       height: 42px;
       font-size: 0.7rem;
+      padding: 0 4px;
+    }
+
+    /* Wide keys also need to shrink so the bottom row fits ≤360px viewports */
+    .wordle-key.wide {
+      min-width: 40px;
+      font-size: 0.65rem;
+    }
+  }
+
+  /* Very small / very short screens (iPhone SE, foldables, landscape) */
+  @media (max-width: 340px) {
+    .wordle-tile {
+      width: 38px;
+      height: 38px;
+      font-size: 0.95rem;
+    }
+
+    .wordle-key {
+      min-width: 22px;
+      height: 38px;
+    }
+
+    .wordle-key.wide {
+      min-width: 34px;
+    }
+  }
+
+  @media (max-height: 700px) {
+    .wordle-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-xs);
+    }
+
+    .wordle-subtitle {
+      margin-bottom: var(--space-md);
+    }
+
+    .wordle-tile {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+
+    .wordle-board {
+      gap: 6px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .wordle-key {
+      height: 38px;
     }
   }
 </style>
